@@ -32,10 +32,10 @@ class ImageProcessing{
 				data[i] = 0xff00ff00;
 			} else if ( b > (r+g)*10/16 & r > g ) {		//PURPLE
 				data[i] = 0xffff00ff;	
-			} else if ( b > (r+g)*6/8 ) {			//BLUE
+			} else if ( r<100 & g<100 & b<100 ) {		//BLACK
+				data[i] = 0xff303030;
+			} else if ( b > (r+g)*5/8 ) {			//BLUE
 				data[i] = 0xffff0000;
-			} else if ( (r-g)*(r-g)<30*30 & (r-b)*(r-b)<30*30 & (g-b)*(g-b)<40*40 & r>110 & g>110 & b>110 ) {			//WHITE
-				data[i] = 0xffffffff;
 			} else {
 				data[i] = 0xff000000;
 			}
@@ -43,6 +43,9 @@ class ImageProcessing{
 	}
 
 	void findWalls( int* data, int* map ) {
+		int Xc_save = 0;
+		int Zc_save = 0;
+		int wallBroken = 0;
 		for ( int i= 0; i < 320*240; i++ ) {
 			map[i] = 0x00000000;
 		}
@@ -77,8 +80,8 @@ class ImageProcessing{
 				my--;
 			}
 			if ( bottom > 0 && bottom<230 ) {
-				for ( int q = 0; q < 3; q++ )
-					data[x+320*(bottom+q)] = 0xffffff00;
+				//for ( int q = 0; q < 3; q++ )
+				//	data[x+320*(bottom+q)] = 0xffffff00;
 			}
 
 			//IF WHITE WALL or YELLOW WALL
@@ -127,8 +130,8 @@ class ImageProcessing{
 			}
 
 			if ( top > 0 && top<230 ) {
-				for ( int q = 0; q < 3; q++ )
-					data[x+320*(top+q)] = 0xffffff00;
+				//for ( int q = 0; q < 3; q++ )
+				//	data[x+320*(top+q)] = 0xffffff00;
 			}
 
 			//Draw to map
@@ -153,9 +156,24 @@ class ImageProcessing{
 			int dest = Xcoord+Zcoord*320;
 			if ( Xcoord>0 && Xcoord<320 && Zcoord>0 && Zcoord<240 ) {
 				map[dest] = color;
-				if ( deviation>30 ) { //exploration choice
-					//int ccc = (int)(Xcoord + (-1*Z+120)*320);
-					//map[ccc] = 0xff0000ff;
+				if ( deviation>14*14 ) { //exploration choice
+					if ( wallBroken==0 ) {
+						Xc_save = Xcoord;					
+						Zc_save = ((Zcoord)+(-1*Z*scale_map+120))/2;
+					}
+					wallBroken++;
+				}
+				else if ( deviation<6 && wallBroken>0 ) {
+					wallBroken++;
+					if ( wallBroken>4 ) {
+						int ccc = (int)(Xc_save+Zc_save*320);
+						for ( int q = -3; q <=3; q++ ) {
+							map[ccc+q+320*q] = 0xff0000ff;
+							map[ccc+q-320*q] = 0xff0000ff;
+						}
+					}
+				} else {
+					wallBroken = 0;
 				}
 			}
 			
@@ -174,8 +192,8 @@ class ImageProcessing{
 
 	int findBalls( int* data, float* ballData, int* map ) {
 		int ballCount = 0;
-		for ( int y = 0; y < 240; y+=4 ) {
-			for ( int x = 0; x < 320; x+=10 ) {
+		for ( int y = 0; y < 240; y+=5 ) {
+			for ( int x = 0; x < 320; x+=5 ) {
 				int pix = data[x+320*y];
 				if ( pix==0xff0000ff | pix==0xff00ff00 ) {
 					bool valid = floodFind(x,y,data,pix);
@@ -233,7 +251,7 @@ class ImageProcessing{
 		if ( minX<=1 && Nblob>40 ) {sided = true; dx = dy;}
 		if ( maxY>=239 && Nblob>30 ) {sided = true; dy=dx;}
 
-		if ( ratio>0.75 && ratio<1.25 && fraction > 0.65 && fraction < 0.85 && Nblob>=20 || sided ) {
+		if ( ratio>0.75 && ratio<1.25 && fraction > 0.55 && fraction < 0.95 && Nblob>=20 || sided ) {
 			ballInfo[0] = (minX+maxX)/2;
 			ballInfo[1] = (minY+maxY)/2;
 			ballInfo[2] = (dx+dy)/2;

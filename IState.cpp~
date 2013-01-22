@@ -1,0 +1,5 @@
+class IState {
+    public:
+	virtual ~IState() {}
+        virtual IState run( ImageProcessing* imgProc, int* map, ArduinoController* ard ) = 0;
+}

@@ -1,13 +1,15 @@
 #include <iostream>
 #include <math.h>
+#include "ImageProcessing.cpp"
 
 class ArduinoController{
     private:
 	float prevG = 0;
 	float intG = 0;
+	int gyro = 0;
 
     public:
-	void process( int* data, int gyro, ImageProcessing* imgProc ) {
+	void process( int* data, ImageProcessing* imgProc ) {
 		float E = getHeadingError(gyro,0);
 		if ( E*E<0.2 ) {
 			driveController(E,100,data);
@@ -16,7 +18,9 @@ class ArduinoController{
 		}
 	}
 
-	float getHeadingError( int gyro, int desired ) {
+	void setGyro( int g ) { gyro = g; }
+
+	float getHeadingError( int gyro, int dest ) {
 		float desired = dest/57.3f;
 		float Dx = -cos(desired);
 		float Dy = -sin(desired);
@@ -29,7 +33,7 @@ class ArduinoController{
 		return E;		
 	}
 
-	void driveController( float error, int base, int* data ) {
+	void driveController( float E, int base, int* data ) {
 		// PID controller
 		intG += E;
 		if ( intG>4 ) intG = 4;
@@ -38,8 +42,8 @@ class ArduinoController{
 		if ( M>1 ) M=1;
 		if ( M<-1 ) M=-1;
 		prevG = E;
-		leftM = (int)(base+M*100);
-		rightM = (int)(base-M*100);
+		int leftM = (int)(base+M*100);
+		int rightM = (int)(base-M*100);
 		if ( leftM>255 ) leftM = 255;
 		if ( leftM<-255 ) leftM = -255;
 		if ( rightM>255 ) rightM = 255;
@@ -66,5 +70,6 @@ class ArduinoController{
 
 extern "C" {
     ArduinoController* ArduinoController_new(){ return new ArduinoController(); }
-    void ArduinoController_process(ArduinoController* arc, int* data, int gyro, ImageProcessing* imgProc){ arc->process(data,gyro,imgProc); }
+    void ArduinoController_setGyro(ArduinoController* arc, int gyro) { arc->setGyro(gyro); }
+    void ArduinoController_process(ArduinoController* arc, int* data, ImageProcessing* imgProc){ arc->process(data,imgProc); }
 }

@@ -32,9 +32,12 @@ class ArduinoController(object):
 	self.data = str(bytearray(4*10))
 	self.ard = ard
 
-    def process(self,gyro,imgProc):
+    def setGyro(self,gyro):
+        libArduino.ArduinoController_setGyro(self.obj,gyro)
+
+    def process(self,imgProc):
 	self.ard.notify()
-        libArduino.ArduinoController_process(self.obj,self.data,gyro,imgProc)
+        libArduino.ArduinoController_process(self.obj,self.data,imgProc)
 
 
 #Initialize Pygame
@@ -77,8 +80,9 @@ while ( time.time()<ENDTIME ):
 
 	#Arduino Interface
 	gyro = imumu.getRawValues()[0]
+	commArd.setGyro(gyro)
 
-	#commArd.process(gyro,headings[ptr])
+	commArd.process(imgProc)
 	commData = commArd.data
 	leftD = ord(commData[3])-1
 	rightD = ord(commData[1])-1
