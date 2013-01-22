@@ -1,10 +1,11 @@
 #include <iostream>
 #include <math.h>
 #define spread 1.2f
+#define scale_map 2.0f
 
 class ImageProcessing{
     private:
-	int ballInfo[4];
+	float ballInfo[4];
 	int minX;
 	int minY;
 	int maxX;
@@ -140,21 +141,15 @@ class ImageProcessing{
 			int eta = bottom-top;
 			int xi = x-160;
 			float d = beta*6.0f/(eta);
-			//float disc = d*d-camera_height*camera_height;
-			//if ( disc<0 )
-			//	continue;
 			float theta = xi/320.0f*spread;
-			float extent = (float)tan(theta);
-			if ( extent<0 )
-				extent = -1*extent;
-			float Z = d;//sqrt(disc/(extent+1.0f));
+			float Z = d;
 			float deviation = (Z-prev)*(Z-prev);
 			if ( deviation<6 ) //smoothen mapping
 				Z = (Z+prev)/2.0f;
 			prev = Z;
 			float X = (float)(Z*tan(theta));//Z*(xi)/alpha;
-			int Xcoord = (int)(X*1+160);
-			int Zcoord = (int)(-Z*1+120);
+			int Xcoord = (int)(X*scale_map+160);
+			int Zcoord = (int)(-Z*scale_map+120);
 			int dest = Xcoord+Zcoord*320;
 			if ( Xcoord>0 && Xcoord<320 && Zcoord>0 && Zcoord<240 ) {
 				map[dest] = color;
@@ -177,7 +172,7 @@ class ImageProcessing{
 		}
 	}
 
-	int findBalls( int* data, int* ballData ) {
+	int findBalls( int* data, float* ballData, int* map ) {
 		int ballCount = 0;
 		for ( int y = 0; y < 240; y+=4 ) {
 			for ( int x = 0; x < 320; x+=10 ) {
@@ -186,10 +181,31 @@ class ImageProcessing{
 					bool valid = floodFind(x,y,data,pix);
 					if ( valid ) {
 						int base = ballCount<<2;
-						ballData[base] = ballInfo[0];
-						ballData[base+1] = ballInfo[1];
-						ballData[base+2] = ballInfo[2];
-						ballData[base+3] = ballInfo[3];
+
+						int eta = ballInfo[2];
+						int xi = ballInfo[0]-160;
+						float d = beta*2.5f/(eta);
+						float theta = xi/320.0f*spread;
+						float Z = d;
+						float X = (float)(Z*tan(theta));			
+
+						int Xcoord = (int)(X*scale_map+160);
+						int Zcoord = (int)(-Z*scale_map+120);
+						int dest = Xcoord+Zcoord*320;
+						if ( Xcoord>0 && Xcoord<320 && Zcoord>0 && Zcoord<240 ) {
+							for ( int xx = -3; xx<=3; xx++ ) {
+								for ( int yy = -3; yy<=3; yy++ ) {
+									if ( xx*xx+yy*yy>5 )
+										continue;
+									map[dest+xx+yy*320] = pix;
+								}
+							}
+						}
+
+						ballData[base] = theta;
+						ballData[base+1] = d;
+						ballData[base+2] = eta;
+						ballData[base+3] = pix;
 						ballCount++;
 					}
 				}
@@ -212,7 +228,12 @@ class ImageProcessing{
 		float ratio = (float)(dx)/(float)(dy);
 		float fraction = (float)(Nblob)/(float)(dx*dy);
 
-		if ( ratio>0.75 && ratio<1.25 && fraction > 0.65 && fraction < 0.85 && Nblob>=20 ) {
+		bool sided = false;
+		if ( maxX>=319 && Nblob>40 ) {sided = true; dx = dy;}
+		if ( minX<=1 && Nblob>40 ) {sided = true; dx = dy;}
+		if ( maxY>=239 && Nblob>30 ) {sided = true; dy=dx;}
+
+		if ( ratio>0.75 && ratio<1.25 && fraction > 0.65 && fraction < 0.85 && Nblob>=20 || sided ) {
 			ballInfo[0] = (minX+maxX)/2;
 			ballInfo[1] = (minY+maxY)/2;
 			ballInfo[2] = (dx+dy)/2;
@@ -227,7 +248,7 @@ class ImageProcessing{
 			return;
 		int pix = data[x+y*320];
 		if ( pix==search ) {
-			data[x+y*320] = 0x000000fe;
+			data[x+y*320] |= 0x00010101;
 			Nblob++;
 			if ( x < minX ) minX = x;
 			if ( y < minY ) minY = y;
@@ -245,6 +266,6 @@ class ImageProcessing{
 extern "C" {
     ImageProcessing* ImageProcessing_new(){ return new ImageProcessing(); }
     void ImageProcessing_classify(ImageProcessing* imgProc, int* data){ imgProc->classify(data); }
-    int ImageProcessing_findBalls(ImageProcessing* imgProc, int* data, int* ballData){ return imgProc->findBalls(data,ballData); }
+    int ImageProcessing_findBalls(ImageProcessing* imgProc, int* data, float* ballData, int* map){ return imgProc->findBalls(data,ballData,map); }
     void ImageProcessing_findWalls(ImageProcessing* imgProc, int* data, int* map){ return imgProc->findWalls(data,map); }
 }

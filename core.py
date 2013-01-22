@@ -5,6 +5,26 @@ import arduino
 from ctypes import cdll
 from bitarray import bitarray
 libArduino = cdll.LoadLibrary('./libarduino.so')
+libImgProc = cdll.LoadLibrary('./libimgproc.so')
+
+class ImageProcessing(object):
+    def __init__(self):
+        self.obj = libImgProc.ImageProcessing_new()
+	self.ballTemp = str(bytearray(16*10))
+	self.map = str(bytearray(4*320*240))
+	self.ballData = ""
+	self.ballCount = 0
+	self.ballList = []
+
+    def classify(self,data):
+        libImgProc.ImageProcessing_classify(self.obj,data)
+
+    def findWalls(self,data):
+        libImgProc.ImageProcessing_findWalls(self.obj,data,self.map)
+
+    def findBalls(self,data):
+        libImgProc.ImageProcessing_findBalls(self.obj,data,self.ballTemp,self.map)
+
 
 class ArduinoController(object):
     def __init__(self,ard):
@@ -12,9 +32,9 @@ class ArduinoController(object):
 	self.data = str(bytearray(4*10))
 	self.ard = ard
 
-    def process(self,gyro,desired):
+    def process(self,gyro,imgProc):
 	self.ard.notify()
-        libArduino.ArduinoController_process(self.obj,self.data,gyro,desired)
+        libArduino.ArduinoController_process(self.obj,self.data,gyro,imgProc)
 
 
 #Initialize Pygame
@@ -27,8 +47,10 @@ cam.start()
 cam.get_image()
 frames = 0
 prev = time.time()
-screen = pygame.display.set_mode((320,240))
+screen = pygame.display.set_mode((320,480))
 
+#Initialize IMAGE PROCESSING
+imgProc = ImageProcessing()
 
 #Initialize ARDUINO
 ard = arduino.Arduino()
@@ -38,14 +60,10 @@ imumu = arduino.IMU(ard)
 ard.run()
 commArd = ArduinoController(ard)
 
-headings = [-110,-180-40,-100]
-timers = [7.8,1.8,3]
-RECKON = time.time()
-ptr = 0
-
 #Game timer
 ENDTIME = time.time()+3*60
-
+frames = 0
+prev = time.time()
 
 while ( time.time()<ENDTIME ):
 	#Image Capture
@@ -53,17 +71,14 @@ while ( time.time()<ENDTIME ):
 	data = pygame.image.tostring(img,"RGBX")
 
 	#Image processing	
-	
+	imgProc.classify(data)
+	imgProc.findWalls(data)
+	imgProc.findBalls(data)
+
 	#Arduino Interface
 	gyro = imumu.getRawValues()[0]
 
-	if ( time.time()-RECKON > timers[ptr] ):
-		ptr+=1
-		RECKON = time.time()
-		if ( ptr >= len(timers) ):
-			break
-
-	commArd.process(gyro,headings[ptr])
+	commArd.process(gyro,imgProc)
 	commData = commArd.data
 	leftD = ord(commData[3])-1
 	rightD = ord(commData[1])-1
@@ -73,8 +88,11 @@ while ( time.time()<ENDTIME ):
 
 	#Pygame output
 	img = pygame.image.fromstring(data,(320,240),"RGBX")
+	imgM = pygame.image.fromstring(imgProc.map,(320,240),"RGBX")
 	rect = img.get_rect()
 	screen.blit(img,rect)
+	rect = rect.move(0,240)
+	screen.blit(imgM,rect)
 
 	#FPS
 	pygame.display.update()

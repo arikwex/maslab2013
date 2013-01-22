@@ -7,34 +7,48 @@ class ArduinoController{
 	float intG = 0;
 
     public:
-	void process( int* data, int gyro, int ddd ) {
-		int leftM = 140;
-		int rightM = 140;
+	void process( int* data, int gyro, ImageProcessing* imgProc ) {
+		float E = getHeadingError(gyro,0);
+		if ( E*E<0.2 ) {
+			driveController(E,100,data);
+		} else {
+			driveController(E,0,data);
+		}
+	}
 
-		// controls
-		float desired = ddd/57.3;
+	float getHeadingError( int gyro, int desired ) {
+		float desired = dest/57.3f;
 		float Dx = -cos(desired);
 		float Dy = -sin(desired);
-		float ang = gyro/57.3;
+		float ang = gyro/57.3f;
 		float dx = cos(ang);
 		float dy = sin(ang);
 		float E = dx*Dy-dy*Dx;
+		if ( dx*Dx+dy*Dy<0 ) E = -1;
+		if ( dx*Dx+dy*Dy>0 ) E = 1;
+		return E;		
+	}
+
+	void driveController( float error, int base, int* data ) {
+		// PID controller
 		intG += E;
 		if ( intG>4 ) intG = 4;
 		if ( intG<-4 ) intG = -4;
-		float M = E*1.0f+0.7f*(E-prevG)+intG*0.2;
+		float M = E*1.0f+0.7f*(E-prevG)+intG*0.2f;
 		if ( M>1 ) M=1;
 		if ( M<-1 ) M=-1;
 		prevG = E;
-		leftM = (int)(0+M*100);
-		rightM = (int)(0-M*100);
-		std::cout << E << std::endl;
-		if ( E*E<0.1 ) {
-			leftM = (int)(100+M*60);
-			rightM = (int)(100-M*60);
-		}
-		// 
+		leftM = (int)(base+M*100);
+		rightM = (int)(base-M*100);
+		if ( leftM>255 ) leftM = 255;
+		if ( leftM<-255 ) leftM = -255;
+		if ( rightM>255 ) rightM = 255;
+		if ( rightM<-255 ) rightM = -255;
+		
+		setMotors(leftM,rightM,data);
+	}
 
+	void setMotors( int leftM, int rightM, int* data ) {
 		int leftD = 2;
 		int rightD = 2;
 		if ( leftM < 0 ) {
@@ -52,5 +66,5 @@ class ArduinoController{
 
 extern "C" {
     ArduinoController* ArduinoController_new(){ return new ArduinoController(); }
-    void ArduinoController_process(ArduinoController* arc, int* data, int gyro, int ddd){ arc->process(data,gyro,ddd); }
+    void ArduinoController_process(ArduinoController* arc, int* data, int gyro, ImageProcessing* imgProc){ arc->process(data,gyro,imgProc); }
 }
