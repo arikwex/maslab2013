@@ -104,6 +104,7 @@ class Arduino(threading.Thread):
         for i in self.analogOutputs:
             output += chr(i)
         output += ";"
+	print " DEMO : " + output
         self.port.write(output)
         #print output
 
@@ -129,6 +130,7 @@ class Arduino(threading.Thread):
 
             # Process arguments based on mode
             # Digital
+            '''
             if (mode == 'D'):
                 length = ord(self.serialRead())
                 # Fill the digitalSensors array with incoming data
@@ -144,7 +146,8 @@ class Arduino(threading.Thread):
                     byte1 = ord(self.serialRead())
                     self.analogInputs[i] = byte1 * 256 + byte0
             # IMU
-            elif (mode == 'U'):
+            '''
+            if (mode == 'U'):
                 # Read compass (2 bytes)
                 byte0 = ord(self.serialRead())
                 byte1 = ord(self.serialRead())
