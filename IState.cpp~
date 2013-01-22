@@ -1,5 +1,15 @@
+#ifndef ISTATE_INCLUDE
+#define ISTATE_INCLUDE
+
+#include "ArduinoController.cpp"
+#include "ImageProcessing.cpp"
+
+class ArduinoController;
+
 class IState {
     public:
-	virtual ~IState() {}
-        virtual IState run( ImageProcessing* imgProc, int* map, ArduinoController* ard ) = 0;
-}
+	~IState() {}
+        IState update( ImageProcessing* imgProc, int* map, ArduinoController* ard ){return this;}
+};
+
+#endif

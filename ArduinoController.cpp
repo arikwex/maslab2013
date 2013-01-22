@@ -1,21 +1,41 @@
+#ifndef ARDUINO_INCLUDE
+#define ARDUINO_INCLUDE
+
 #include <iostream>
 #include <math.h>
 #include "ImageProcessing.cpp"
+#include "ExploreState.cpp"
+#include "IState.cpp"
 
 class ArduinoController{
     private:
-	float prevG = 0;
-	float intG = 0;
-	int gyro = 0;
+	float prevG;
+	float intG;
+	int gyro;
+	IState* behavior;
 
     public:
-	void process( int* data, ImageProcessing* imgProc ) {
+	ArduinoController() {
+		behavior = new ExploreState();
+		prevG = 0;
+		intG = 0;
+		gyro = 0;
+	}
+
+	~ArduinoController() {
+		delete behavior;
+	}
+
+	void process( int* data, ImageProcessing* imgProc, int* map ) {
+		behavior = behavior->update( imgProc, map, this );
+/*		
 		float E = getHeadingError(gyro,0);
 		if ( E*E<0.2 ) {
 			driveController(E,100,data);
 		} else {
 			driveController(E,0,data);
 		}
+*/
 	}
 
 	void setGyro( int g ) { gyro = g; }
@@ -71,5 +91,6 @@ class ArduinoController{
 extern "C" {
     ArduinoController* ArduinoController_new(){ return new ArduinoController(); }
     void ArduinoController_setGyro(ArduinoController* arc, int gyro) { arc->setGyro(gyro); }
-    void ArduinoController_process(ArduinoController* arc, int* data, ImageProcessing* imgProc){ arc->process(data,imgProc); }
+    void ArduinoController_process(ArduinoController* arc, int* data, ImageProcessing* imgProc, int* map){ arc->process(data,imgProc,map); }
 }
+#endif

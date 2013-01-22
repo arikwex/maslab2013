@@ -37,7 +37,7 @@ class ArduinoController(object):
 
     def process(self,imgProc):
 	self.ard.notify()
-        libArduino.ArduinoController_process(self.obj,self.data,imgProc.obj)
+        libArduino.ArduinoController_process(self.obj,self.data,imgProc.obj,imgProc.map)
 
 
 #Initialize Pygame
