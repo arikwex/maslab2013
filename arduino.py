@@ -171,13 +171,14 @@ class Arduino(threading.Thread):
     def checkPorts(self):
 	self.notified = time.time()
         # If killReceived is set to true, we want to kill this thread
-        while not self.killReceived and time.time()-self.notified<1.0:
+        while not self.killReceived and time.time()-self.notified<2.0:
             #print "Packet -- writing"
             self.writeOutputPacket()
 
             #print "Packet -- reading"
             self.readInputPacket()
 
+	print "ARDUINO IS DONE!"
         # If we get here, we received the kill signal
         self.cleanup()
 

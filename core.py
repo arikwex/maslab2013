@@ -57,8 +57,8 @@ imgProc = ImageProcessing()
 
 #Initialize ARDUINO
 ard = arduino.Arduino()
-m0 = arduino.Motor(ard,0,2,11)
-m1 = arduino.Motor(ard,0,3,12)
+mL = arduino.Motor(ard,0,38,39)
+mR = arduino.Motor(ard,0,40,41)
 imumu = arduino.IMU(ard)
 ard.run()
 commArd = ArduinoController(ard)
@@ -86,9 +86,10 @@ while ( time.time()<ENDTIME ):
 	commData = commArd.data
 	leftD = ord(commData[3])-1
 	rightD = ord(commData[1])-1
-	m0.setSpeed(leftD*ord(commData[2]))
-	m1.setSpeed(rightD*ord(commData[0]))
-	#print str(gyro) + " --- " + str(leftD*ord(commData[2])) +", " + str(rightD*ord(commData[0]))
+	mL.setSpeed(60)#leftD*ord(commData[2]))
+	mR.setSpeed(63)#rightD*ord(commData[0]))
+	#print str(gyro)
+	print str(gyro) + " --- " + str(leftD*ord(commData[2])) +", " + str(rightD*ord(commData[0]))
 
 	#Pygame output
 	img = pygame.image.fromstring(data,(320,240),"RGBX")

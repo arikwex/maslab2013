@@ -104,7 +104,6 @@ class Arduino(threading.Thread):
         for i in self.analogOutputs:
             output += chr(i)
         output += ";"
-	print " DEMO : " + output
         self.port.write(output)
         #print output
 
@@ -172,13 +171,14 @@ class Arduino(threading.Thread):
     def checkPorts(self):
 	self.notified = time.time()
         # If killReceived is set to true, we want to kill this thread
-        while not self.killReceived and time.time()-self.notified<1.0:
+        while not self.killReceived and time.time()-self.notified<2.0:
             #print "Packet -- writing"
             self.writeOutputPacket()
 
             #print "Packet -- reading"
             self.readInputPacket()
 
+	print "ARDUINO IS DONE!"
         # If we get here, we received the kill signal
         self.cleanup()
 
@@ -358,8 +358,8 @@ class Servo:
         # Clamp to [0, 180]
         if angle < 0:
             angle = 0
-        elif angle > 180:
-            angle = 180
+        elif angle > 250:
+            angle = 250
         self.arduino.setServoAngle(self.index, angle)
 
 # Class to interact with a motor
