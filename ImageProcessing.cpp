@@ -7,8 +7,10 @@
 #define scale_map 2.0f
 
 class ImageProcessing{
-    private:
+    public:
 	float ballInfo[4];
+	float* storedBalls;
+	int ballCount;
 	int minX;
 	int minY;
 	int maxX;
@@ -182,7 +184,7 @@ class ImageProcessing{
 	}
 
 	int findBalls( int* data, float* ballData, int* map ) {
-		int ballCount = 0;
+		ballCount = 0;
 		for ( int y = 0; y < 240; y+=5 ) {
 			for ( int x = 0; x < 320; x+=5 ) {
 				int pix = data[x+320*y];
@@ -215,6 +217,7 @@ class ImageProcessing{
 						ballData[base+1] = d;
 						ballData[base+2] = eta;
 						ballData[base+3] = pix;
+						this->storedBalls = ballData;
 						ballCount++;
 					}
 				}

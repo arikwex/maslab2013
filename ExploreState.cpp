@@ -7,7 +7,7 @@
 
 class ExploreState : public IState {
     public:
-	IState* update( ImageProcessing* imgProc, int* map, ArduinoController* ard ) {
+	IState* update( ImageProcessing* imgProc, int* map, int* data, int gyro ) {
 		return this;
 	}
 };

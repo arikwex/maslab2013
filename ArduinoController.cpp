@@ -5,10 +5,11 @@
 #include <math.h>
 #include "ImageProcessing.cpp"
 #include "ExploreState.cpp"
+#include "BallCollectState.cpp"
 #include "IState.cpp"
 
 class ArduinoController{
-    private:
+    public:
 	float prevG;
 	float intG;
 	int gyro;
@@ -16,7 +17,7 @@ class ArduinoController{
 
     public:
 	ArduinoController() {
-		behavior = new ExploreState();
+		behavior = new BallCollectState();
 		prevG = 0;
 		intG = 0;
 		gyro = 0;
@@ -27,65 +28,22 @@ class ArduinoController{
 	}
 
 	void process( int* data, ImageProcessing* imgProc, int* map ) {
-		behavior = behavior->update( imgProc, map, this );
-
-		float E = getHeadingError(gyro,0);
+		//std::cout << "GOOGLE" << std::endl;
+		
+		behavior = behavior->update( imgProc, map, data, gyro );
+		//setTurbine(0,data);
+		//float E = getHeadingError(gyro,0);
 //		if ( E*E<0.2 ) {
 //			driveController(E,100,data);
 //		} else {
-		driveController(E,0,data);
+//		driveController(E,40,data);
 //		}
 	}
 
 	void setGyro( int g ) { gyro = g; }
 
-	float getHeadingError( int gyro, int dest ) {
-		float desired = dest/57.3f;
-		float Dx = -cos(desired);
-		float Dy = -sin(desired);
-		float ang = gyro/57.3f;
-		float dx = cos(ang);
-		float dy = sin(ang);
-		float E = dx*Dy-dy*Dx;
-		if ( dx*Dx+dy*Dy<0 ) {
-			if ( E<0 ) E=-1;
-			else E=1;
-		}
-		return E;		
-	}
-
-	void driveController( float E, int base, int* data ) {
-		// PID controller
-		intG += E*0.08f;
-		if ( intG>4 ) intG = 4;
-		if ( intG<-4 ) intG = -4;
-		float M = E*0.6f+intG*0.3f;//(E*1.0f+0.7f*(E-prevG)+intG*0.2f);
-		if ( M>1 ) M=1;
-		if ( M<-1 ) M=-1;
-		prevG = E;
-		int leftM = (int)(base+M*60);
-		int rightM = (int)(base-M*60);
-
-		setMotors(leftM,rightM,data);
-	}
-
-	void setMotors( int leftM, int rightM, int* data ) {
-		if ( leftM>255 ) leftM = 255;
-		if ( leftM<-255 ) leftM = -255;
-		if ( rightM>255 ) rightM = 255;
-		if ( rightM<-255 ) rightM = -255;
-		
-		int leftD = 2;
-		int rightD = 2;
-		if ( leftM < 0 ) {
-			leftM = -leftM;
-			leftD = 0;
-		}
-		if ( rightM < 0 ) {
-			rightM = -rightM;
-			rightD = 0;
-		}
-		data[0] = (leftD<<24) | (leftM<<16) | (rightD<<8) | (rightM);
+	void setTurbine( int a, int* data ) {
+		data[1] = a;
 	}
 };
 

@@ -45,7 +45,7 @@ import pygame.camera
 import pygame.image
 pygame.camera.init()
 cams = pygame.camera.list_cameras()
-cam = pygame.camera.Camera(cams[1],(320,240))
+cam = pygame.camera.Camera(cams[0],(320,240))
 cam.start()
 cam.get_image()
 frames = 0
@@ -57,14 +57,15 @@ imgProc = ImageProcessing()
 
 #Initialize ARDUINO
 ard = arduino.Arduino()
-mL = arduino.Motor(ard,0,38,39)
-mR = arduino.Motor(ard,0,40,41)
+turbine = arduino.Servo(ard,9)
+mR = arduino.Motor(ard,0,10,12)
+mL = arduino.Motor(ard,0,11,13)
 imumu = arduino.IMU(ard)
 ard.run()
 commArd = ArduinoController(ard)
 
 #Game timer
-ENDTIME = time.time()+3*60
+ENDTIME = time.time()+10#3*60
 frames = 0
 prev = time.time()
 
@@ -86,10 +87,12 @@ while ( time.time()<ENDTIME ):
 	commData = commArd.data
 	leftD = ord(commData[3])-1
 	rightD = ord(commData[1])-1
-	mL.setSpeed(60)#leftD*ord(commData[2]))
-	mR.setSpeed(63)#rightD*ord(commData[0]))
+	turbine.setAngle(ord(commData[4]))
+	#print ord(commData[4])	
+	mL.setSpeed(leftD*ord(commData[2]))
+	mR.setSpeed(rightD*ord(commData[0]))
 	#print str(gyro)
-	print str(gyro) + " --- " + str(leftD*ord(commData[2])) +", " + str(rightD*ord(commData[0]))
+	#print str(gyro) + " --- " + str(leftD*ord(commData[2])) +", " + str(rightD*ord(commData[0]))
 
 	#Pygame output
 	img = pygame.image.fromstring(data,(320,240),"RGBX")
@@ -108,7 +111,7 @@ while ( time.time()<ENDTIME ):
 		frames = 0
 		prev = time.time()
 
-m0.setSpeed(0)
-m1.setSpeed(0)
+mL.setSpeed(0)
+mR.setSpeed(0)
 cam.stop()
 pygame.quit()
