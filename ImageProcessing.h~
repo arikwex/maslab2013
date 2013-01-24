@@ -1,0 +1,35 @@
+#ifndef PROCESS_INCLUDE
+#define PROCESS_INCLUDE
+
+#include <iostream>
+#include <math.h>
+
+class ImageProcessing{
+    public:
+	float ballInfo[4];
+	float* storedBalls;
+	int ballCount;
+	int minX;
+	int minY;
+	int maxX;
+	int maxY;
+	int Nblob;
+	float lefts,rights;
+
+	const static float camera_height = 8.0f;
+	const static float alpha = 320.0f/spread;
+	const static float beta = 240.0f/spread;	
+
+    public:
+	void classify( int* data );
+
+	void findWalls( int* data, int* map );
+
+	int findBalls( int* data, float* ballData, int* map );
+
+	bool floodFind( int x, int y, int* data, int search);
+
+	void blobFind( int x, int y, int* data, int search );
+};
+
+#endif

@@ -65,7 +65,7 @@ ard.run()
 commArd = ArduinoController(ard)
 
 #Game timer
-ENDTIME = time.time()+10#3*60
+ENDTIME = time.time()+3*60
 frames = 0
 prev = time.time()
 

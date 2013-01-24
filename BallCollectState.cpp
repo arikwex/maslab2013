@@ -1,19 +1,22 @@
-#ifndef BC_STATE_INCLUDE
-#define BC_STATE_INCLUDE
+#include "BallCollectState.h"
 
-#include "IState.cpp"
-#include "HeadingState.cpp"
-#include "ArduinoController.cpp"
-#include "ImageProcessing.cpp"
+BallCollectState::BallCollectState() {
+	mode = 0;
+	ballLost = 0;
+	destTime = 0;
+}
 
-class BallCollectState : public IState {
-    public:
-	float prevG = 0;
-	float intG = 0;
+IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* ard ) {
 
-	IState* update( ImageProcessing* imgProc, int* map, int* data, int gyro ) {
-		//ard->setTurbine(180,data);
+	////////////////////
+	// CORE OPERATION //
+	////////////////////
+
+	if ( mode==0 ) {
+		//A ball has been seen
 		if ( imgProc->ballCount>0 ) {
+			ballLost = 0;
+
 			//find closest
 			float closest = 1000;
 			int idx = 0;
@@ -26,22 +29,62 @@ class BallCollectState : public IState {
 				}
 			}
 
-			//std::cout << "gyro: " << gyro << " ---> " << (gyro-imgProc->storedBalls[idx+0]*57.3) << std::endl;
+			//if ball is far, approach
+			if ( closest>12 ) {
+				mode = 1;
+				heading = ard->gyro+imgProc->storedBalls[base];
+				destTime = getTime()+closest/8.0;
+			}
+			//if ball is near, go for it
+			else {
+				mode = 2;
+				heading = ard->gyro+imgProc->storedBalls[base];
+				destTime = getTime()+closest/4.0;
+			}
 
-			//Go for it
-			if ( closest>15 ) {
-				data[1] = 180;
-				return new HeadingState((int)(gyro-imgProc->storedBalls[idx+0]*57.3),40,closest/4,180,this);
-			}
-			else if ( closest<15 ) {
-				return new HeadingState((int)(gyro-imgProc->storedBalls[idx+0]*57.3),40,closest*8,90,this);
-			}
-				
 		} else {
-			data[0] = 0;
+			ballLost++;
 		}
-		return this;
+	
+		//Go back to exploration
+		if ( ballLost>10 ) {
+			return new ExploreState();
+		}
 	}
-};
 
-#endif
+	///////////////////
+	// APPROACH BALL //
+	///////////////////
+	else if ( mode==1 ) {
+		float time = getTime();
+		if ( time<destTime ) {
+			float E = ard->getHeadingError();
+			ard->driveController(E,40);
+		} else {
+			mode = 0;
+		}
+	}
+
+	//////////////////
+	// COLLECT BALL //
+	//////////////////
+	else if ( mode==2 ) {
+		float time = getTime();
+		if ( time<destTime ) {
+			float E = ard->getHeadingError();
+			ard->driveController(E,40);
+			if ( time>destTime-0.5 ) {
+				ard->setTurbine(90);
+				ard->collectedBall();
+			}
+		} else {
+			return new ExploreState();
+		}
+	}
+
+	return this;
+}
+
+float BallCollectState::getTime() { 
+	return ((float)clock())/CLOCKS_PER_SEC;
+}

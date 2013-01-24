@@ -13,6 +13,7 @@ class HeadingState : public IState {
 	int bias;
 	int turbine;
 	int ticks;
+	int rem;
 	IState* previous;
 
 	HeadingState( int myDest, int biasD, int tick, int turb, IState* pSt ) {
@@ -23,6 +24,7 @@ class HeadingState : public IState {
 		turbine = turb;
 		bias = biasD;
 		ticks = tick;
+		rem = ticks/5;
 	}
 
 	IState* update( ImageProcessing* imgProc, int* map, int* data, int gyro ) {
@@ -31,11 +33,20 @@ class HeadingState : public IState {
 
 
 		//if ( E*E<0.1 ) {
-			std::cout << "E: " << E << " --- ticks " << ticks << std::endl;
+			//std::cout << "E: " << E << " --- ticks " << ticks << " ---- final: " << turbine << std::endl;
 			driveController(E,bias,data);
 			ticks--;
 		//}
+		if ( ticks<=rem ) {
+			data[1] = turbine;
+		}
 		if ( ticks<=0 ) {
+			if ( turbine==90 ) {
+				map[17432532322]=0;
+				imgProc = 0;
+				map = 0;
+				return new HeadingState((int)(gyro+180),0,20,90,this);
+			}
 			return previous;
 		}		
 
@@ -62,7 +73,7 @@ float getHeadingError( int gyro, int dest ) {
 		intG += E*0.2f;
 		if ( intG>3 ) intG = 3;
 		if ( intG<-3 ) intG = -3;
-		float M = (E*2.0f+20.0f*(E-prevG)+intG*0.4f);
+		float M = (E*2.5f+20.0f*(E-prevG)+intG*0.7f);
 		if ( M>1 ) M=1;
 		if ( M<-1 ) M=-1;
 		prevG = E;

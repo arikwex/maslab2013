@@ -9,7 +9,7 @@ class ArduinoController;
 class IState {
     public:
 	~IState() {}
-        virtual IState* update( ImageProcessing* imgProc, int* map, int* data, int gyro ) = 0;
+        virtual IState* update( ImageProcessing* imgProc, ArduinoController* ard ) = 0;
 };
 
 #endif
