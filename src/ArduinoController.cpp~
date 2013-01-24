@@ -1,9 +1,9 @@
 #include <iostream>
 #include <math.h>
-#include "ArduinoController.h"
-#include "ExploreState.h"
-#include "BallCollectState.h"
-#include "IState.h"
+#include "../headers/ArduinoController.h"
+#include "../headers/ExploreState.h"
+#include "../headers/BallCollectState.h"
+#include "../headers/IState.h"
 
 
 ArduinoController::ArduinoController() {
@@ -46,7 +46,7 @@ float ArduinoController::getHeadingError( float dest ) {
 	return -E;		
 }
 
-void ArduinoController::driveController( float E, int base, int* data ) {
+void ArduinoController::driveController( float E, int base ) {
 	// PID controller
 	intG += E*0.2f;
 	if ( intG>3 ) intG = 3;
@@ -62,7 +62,7 @@ void ArduinoController::driveController( float E, int base, int* data ) {
 }
 
 
-void ArduinoController::setMotors( int leftM, int rightM, int* data ) {
+void ArduinoController::setMotors( int leftM, int rightM ) {
 	if ( leftM>255 ) leftM = 255;
 	if ( leftM<-255 ) leftM = -255;
 	if ( rightM>255 ) rightM = 255;
@@ -79,6 +79,14 @@ void ArduinoController::setMotors( int leftM, int rightM, int* data ) {
 		rightD = 0;
 	}
 	data[0] = (leftD<<24) | (leftM<<16) | (rightD<<8) | (rightM);
+}
+
+int ArduinoController::numCollectedBalls() {
+	return collectedBalls;
+}
+
+float ArduinoController::getGyro() {
+	return gyro;
 }
 
 extern "C" {

@@ -1,4 +1,6 @@
-#include "BallCollectState.h"
+#include "../headers/BallCollectState.h"
+#include "../headers/ExploreState.h"
+#include "../headers/IState.h"
 
 BallCollectState::BallCollectState() {
 	mode = 0;
@@ -32,13 +34,13 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 			//if ball is far, approach
 			if ( closest>12 ) {
 				mode = 1;
-				heading = ard->gyro+imgProc->storedBalls[base];
+				heading = ard->getGyro()+imgProc->storedBalls[idx];
 				destTime = getTime()+closest/8.0;
 			}
 			//if ball is near, go for it
 			else {
 				mode = 2;
-				heading = ard->gyro+imgProc->storedBalls[base];
+				heading = ard->getGyro()+imgProc->storedBalls[idx];
 				destTime = getTime()+closest/4.0;
 			}
 
@@ -58,7 +60,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 	else if ( mode==1 ) {
 		float time = getTime();
 		if ( time<destTime ) {
-			float E = ard->getHeadingError();
+			float E = ard->getHeadingError(heading);
 			ard->driveController(E,40);
 		} else {
 			mode = 0;
@@ -71,7 +73,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 	else if ( mode==2 ) {
 		float time = getTime();
 		if ( time<destTime ) {
-			float E = ard->getHeadingError();
+			float E = ard->getHeadingError(heading);
 			ard->driveController(E,40);
 			if ( time>destTime-0.5 ) {
 				ard->setTurbine(90);

@@ -1,8 +1,8 @@
-#include "ExploreState.h"
+#include "../headers/ExploreState.h"
 
 ExploreState::ExploreState() {
 	ballConfirmation = 0;
-	deplotConfirmation = 0;
+	deployConfirmation = 0;
 }
 
 IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard ) {
@@ -25,7 +25,7 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	}
 
 	//If ball collected and I see a deployment region
-	if ( ard->ballsCollected>0 ) {
+	if ( ard->numCollectedBalls()>0 ) {
 		if ( imgProc->deploymentWallSeen ) {
 			deployConfirmation++;
 			if ( deployConfirmation>=6 ) {

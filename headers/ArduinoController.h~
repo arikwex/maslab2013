@@ -31,13 +31,17 @@ class ArduinoController{
 
 	void setGyro( int g );
 
+	float getGyro();
+
 	void setTurbine( int a, int* data );
 
 	float getHeadingError( float dest );
 
-	void driveController( float E, int base, int* data );
+	void driveController( float E, int base );
 
-	void setMotors( int leftM, int rightM, int* data );
+	void setMotors( int leftM, int rightM );
+
+	int numBallsCollected();
 };
 
 #endif

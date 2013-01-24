@@ -1,10 +1,13 @@
 #ifndef EXPLORE_STATE_INCLUDE
 #define EXPLORE_STATE_INCLUDE
 
+class IState;
+class ArduinoController;
+class ImageProcessing;
+
 #include "ArduinoController.h"
 #include "ImageProcessing.h"
 #include "IState.h"
-#include "BallCollectState.h"
 
 class ExploreState : public IState {
     private:
@@ -12,6 +15,7 @@ class ExploreState : public IState {
 	int deployConfirmation;
 
     public:
+	ExploreState();
 	IState* update( ImageProcessing* imgProc, ArduinoController* ard );
 };
 
