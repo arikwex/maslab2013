@@ -41,7 +41,7 @@ class ArduinoController{
 
 	void setMotors( int leftM, int rightM );
 
-	int numBallsCollected();
+	int numCollectedBalls();
 };
 
 #endif

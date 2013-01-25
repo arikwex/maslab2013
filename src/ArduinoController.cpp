@@ -58,7 +58,7 @@ void ArduinoController::driveController( float E, int base ) {
 	int leftM = (int)(base+M*50);
 	int rightM = (int)(base-M*50);
 
-	setMotors(leftM,rightM,data);
+	setMotors(leftM,rightM);
 }
 
 
@@ -82,7 +82,7 @@ void ArduinoController::setMotors( int leftM, int rightM ) {
 }
 
 int ArduinoController::numCollectedBalls() {
-	return collectedBalls;
+	return ballsCollected;
 }
 
 float ArduinoController::getGyro() {

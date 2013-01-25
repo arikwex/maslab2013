@@ -26,7 +26,7 @@ void ArduinoController::collectedBall() { ballsCollected++; }
 
 void ArduinoController::setGyro( int g ) { gyro = g/100.0f; }
 
-void ArduinoController::setTurbine( int a, int* data ) {
+void ArduinoController::setTurbine( int a ) {
 	turbine = a;
 	data[1] = a;
 }
@@ -58,7 +58,7 @@ void ArduinoController::driveController( float E, int base ) {
 	int leftM = (int)(base+M*50);
 	int rightM = (int)(base-M*50);
 
-	setMotors(leftM,rightM,data);
+	setMotors(leftM,rightM);
 }
 
 

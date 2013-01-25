@@ -9,6 +9,8 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	/////////////////
 	// EXPLORATION //
 	/////////////////
+	
+	//std::cout << "EXPLORE STATE." << std::endl;
 
 	///////////////////////
 	// STATE TRANSITIONS //
@@ -18,6 +20,7 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	if ( imgProc->ballCount>0 ) {
 		ballConfirmation++;
 		if ( ballConfirmation>=6 ) {
+			std::cout << "DETECTED BALL!" << std::endl;
 			return new BallCollectState();
 		}
 	} else {

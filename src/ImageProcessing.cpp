@@ -22,11 +22,11 @@ void ImageProcessing::classify( int* data ) {
 			data[i] = 0xff00ff00;
 		} else if ( b > (r+g)*10/16 & r > g & r>40 & g>40 & b>40) {		//PURPLE
 			data[i] = 0xffff00ff;	
-		} else if ( b > (r+g)*4/8 ) {		//BLUE
+		} else if ( b > (r+g)*6/8 ) {		//BLUE
 			data[i] = 0xffff0000;
-		} /*else if ( r<100 & g<100 & b<100 ) {		//BLACK
-			data[i] = 0xff303030;
-		} */else {
+		} else if ( r<150 & g<150 & b<150 ) {	//BLACK treat as blue
+			data[i] = 0xffff0000;
+		} else {
 			data[i] = 0xff000000;
 		}
 	}

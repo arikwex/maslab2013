@@ -4,8 +4,8 @@ sys.path.append("../..")
 import arduino
 from ctypes import cdll
 from bitarray import bitarray
-libArduino = cdll.LoadLibrary('./libarduino.so')
-libImgProc = cdll.LoadLibrary('./libimgproc.so')
+libArduino = cdll.LoadLibrary('shared/libarduino.so')
+libImgProc = cdll.LoadLibrary('shared/libimgproc.so')
 
 class ImageProcessing(object):
     def __init__(self):
@@ -65,7 +65,7 @@ ard.run()
 commArd = ArduinoController(ard)
 
 #Game timer
-ENDTIME = time.time()+20#3*60
+ENDTIME = time.time()+3*60
 frames = 0
 prev = time.time()
 

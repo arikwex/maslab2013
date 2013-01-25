@@ -33,7 +33,7 @@ class ArduinoController{
 
 	float getGyro();
 
-	void setTurbine( int a, int* data );
+	void setTurbine( int a );
 
 	float getHeadingError( float dest );
 
