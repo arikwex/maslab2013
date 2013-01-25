@@ -24,7 +24,7 @@ void ImageProcessing::classify( int* data ) {
 			data[i] = 0xffff00ff;	
 		} else if ( b > (r+g)*6/8 ) {		//BLUE
 			data[i] = 0xffff0000;
-		} else if ( r<100 & g<100 & b<100 ) {	//BLACK treat as blue
+		} else if ( r<140 & g<140 & b<140 ) {	//BLACK treat as blue
 			data[i] = 0xffff0000;
 		} else {
 			data[i] = 0xff000000;
@@ -49,6 +49,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		int bottom = 239;
 		int top = 0;
 		int consecutive = 0;
+		float objHeight = 6;
 		//detect blue termination
 		while ( my>0 & mx >= 0 & mx < 320) {
 			int idx = mx+320*my;
@@ -87,10 +88,18 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 				int pix = data[idx];
 				if ( pix==0xff00ffff )
 					color = 0xff00ffff;
-				if ( pix==0xffff0000 )
-					break;
+				if ( pix==0xffff0000 ) {
+					consecutive++;
+					if ( consecutive>6 )
+						break;
+				} else {
+					consecutive = 0;
+					top = my;
+				}
 				my--;
 			}
+			objHeight = 4;
+			/*
 			int cutoff = (bottom-my)/2;
 			//detect blue region top
 			consecutive = 0;
@@ -109,6 +118,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 				}
 				my--;
 			}
+			*/
 		} else if ( color==0xffff00ff ) {
 			//detect purple region top ending
 			consecutive = 0;
@@ -142,7 +152,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		// z^2*(tan(theta)+1) = d^2 - h^2
 		int eta = bottom-top;
 		int xi = x-160;
-		float d = beta*6.0f/(eta);
+		float d = beta*objHeight/(eta);
 		float theta = xi/320.0f*spread;
 		float Z = d;
 		float deviation = (Z-prev)*(Z-prev);

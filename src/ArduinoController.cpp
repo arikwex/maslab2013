@@ -11,6 +11,7 @@ ArduinoController::ArduinoController() {
 	prevG = 0;
 	intG = 0;
 	gyro = 0;
+	turbine = 180;
 }
 
 ArduinoController::~ArduinoController() {
@@ -20,6 +21,7 @@ ArduinoController::~ArduinoController() {
 void ArduinoController::process( int* comm, ImageProcessing* imgProc, int* map ) {
 	data = comm;
 	behavior = behavior->update( imgProc, this );
+	data[1] = turbine;
 }
 
 void ArduinoController::collectedBall() { ballsCollected++; }
@@ -28,7 +30,6 @@ void ArduinoController::setGyro( int g ) { gyro = g/100.0f; }
 
 void ArduinoController::setTurbine( int a ) {
 	turbine = a;
-	data[1] = a;
 }
 
 float ArduinoController::getHeadingError( float dest ) {
@@ -48,10 +49,10 @@ float ArduinoController::getHeadingError( float dest ) {
 
 void ArduinoController::driveController( float E, int base ) {
 	// PID controller
-	intG += E*0.2f;
-	if ( intG>3 ) intG = 3;
-	if ( intG<-3 ) intG = -3;
-	float M = (E*2.5f+20.0f*(E-prevG)+intG*0.7f);
+	intG += E;
+	if ( intG>0.1 ) intG = 0.1;
+	if ( intG<-0.1 ) intG = -0.1;
+	float M = (E*5.0f+10.0f*(E-prevG)+intG*0.6f);
 	if ( M>1 ) M=1;
 	if ( M<-1 ) M=-1;
 	prevG = E;

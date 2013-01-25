@@ -32,20 +32,22 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 					closest = a;
 				}
 			}
-			std::cout << "Distance: " << closest << std::endl;
-
+			//std::cout << "Distance: " << closest << std::endl;
+			//return this;
 			//if ball is far, approach
-			if ( closest>12 ) {
+			if ( closest>10 ) {
+				if ( closest>20 ) closest = 20;
 				mode = 1;
-				heading = ard->getGyro()+imgProc->storedBalls[idx];
+				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;
 				destTime = getTime()+closest/8.0;
-				//std::cout << "Approach ball until: " << destTime << ", currTime = " << getTime() << std::endl;
+				//std::cout << imgProc->storedBalls[idx]*57.3 << std::endl;
 			}
 			//if ball is near, go for it
 			else {
-				mode = 2;
-				heading = ard->getGyro()+imgProc->storedBalls[idx];
-				destTime = getTime()+closest/4.0;
+				//mode = 2;
+				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;
+				destTime = getTime()+closest*0.4f;
+				std::cout << "GO TO TOWN!" << std::endl;
 			}
 
 		} else {
@@ -66,7 +68,8 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 		float time = getTime();
 		if ( time<destTime ) {
 			float E = ard->getHeadingError(heading);
-			ard->driveController(E,40);
+			std::cout << ard->getGyro() << " --> " << heading << std::endl;
+			ard->driveController(E,0);
 		} else {
 			mode = 0;
 		}
@@ -79,9 +82,9 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 		float time = getTime();
 		if ( time<destTime ) {
 			float E = ard->getHeadingError(heading);
-			ard->driveController(E,40);
+			ard->driveController(E,70);
 			if ( time>destTime-0.5 ) {
-				ard->setTurbine(90);
+				ard->setTurbine(70);
 				ard->collectedBall();
 			}
 		} else {

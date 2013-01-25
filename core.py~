@@ -45,7 +45,7 @@ import pygame.camera
 import pygame.image
 pygame.camera.init()
 cams = pygame.camera.list_cameras()
-cam = pygame.camera.Camera(cams[0],(320,240))
+cam = pygame.camera.Camera(cams[1],(320,240))
 cam.start()
 cam.get_image()
 frames = 0
@@ -65,7 +65,7 @@ ard.run()
 commArd = ArduinoController(ard)
 
 #Game timer
-ENDTIME = time.time()+3*60
+ENDTIME = time.time()+0*60
 frames = 0
 prev = time.time()
 
