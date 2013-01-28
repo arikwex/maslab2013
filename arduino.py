@@ -136,8 +136,9 @@ class Arduino(threading.Thread):
                 for i in range(length):
                     # If we read in a 1, then the digital input is HIGH
                     self.digitalInputs[i] = ord(self.serialRead())==1
+            '''
             # Analog
-            elif (mode == 'A'):
+            if (mode == 'A'):
                 length = ord(self.serialRead())
                 # Fill the analogSensors array with incoming data
                 for i in range(length):
@@ -145,7 +146,7 @@ class Arduino(threading.Thread):
                     byte1 = ord(self.serialRead())
                     self.analogInputs[i] = byte1 * 256 + byte0
             # IMU
-            '''
+            
             if (mode == 'U'):
                 # Read compass (2 bytes)
                 byte0 = ord(self.serialRead())
@@ -235,6 +236,7 @@ class Arduino(threading.Thread):
         output += chr(numAnalog)
         for i in range(numAnalog):
             output += chr(self.analogOutputPorts[i])
+
         # IMU component of initializing
         if len(self.imus) > 0:
             output += "U"

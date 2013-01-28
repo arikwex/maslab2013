@@ -136,8 +136,9 @@ class Arduino(threading.Thread):
                 for i in range(length):
                     # If we read in a 1, then the digital input is HIGH
                     self.digitalInputs[i] = ord(self.serialRead())==1
+            '''
             # Analog
-            elif (mode == 'A'):
+            if (mode == 'A'):
                 length = ord(self.serialRead())
                 # Fill the analogSensors array with incoming data
                 for i in range(length):
@@ -145,7 +146,7 @@ class Arduino(threading.Thread):
                     byte1 = ord(self.serialRead())
                     self.analogInputs[i] = byte1 * 256 + byte0
             # IMU
-            '''
+            
             if (mode == 'U'):
                 # Read compass (2 bytes)
                 byte0 = ord(self.serialRead())
@@ -223,6 +224,7 @@ class Arduino(threading.Thread):
         output += chr(numAnalog)
         for i in range(numAnalog):
             output += chr(self.analogInputPorts[i])
+            print "ANALOG INPUT INIT"
         # Digital output component of initializing
         output += "DO"
         numDigital = len(self.digitalOutputPorts)
@@ -235,6 +237,7 @@ class Arduino(threading.Thread):
         output += chr(numAnalog)
         for i in range(numAnalog):
             output += chr(self.analogOutputPorts[i])
+
         # IMU component of initializing
         if len(self.imus) > 0:
             output += "U"
@@ -358,8 +361,8 @@ class Servo:
         # Clamp to [0, 180]
         if angle < 0:
             angle = 0
-        elif angle > 250:
-            angle = 250
+        elif angle > 180:
+            angle = 180
         self.arduino.setServoAngle(self.index, angle)
 
 # Class to interact with a motor
