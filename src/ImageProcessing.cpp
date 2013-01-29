@@ -24,7 +24,7 @@ void ImageProcessing::classify( int* data ) {
 			data[i] = 0xffff00ff;	
 		} else if ( b > (r+g)*6/8 ) {		//BLUE
 			data[i] = 0xffff0000;
-		} else if ( r<100 & g<100 & b<100 ) {	//BLACK treat as blue
+		} else if ( r<140 & g<140 & b<140 ) {	//BLACK treat as blue
 			data[i] = 0xffff0000;
 		} else {
 			data[i] = 0xff000000;
@@ -68,7 +68,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 				consecutive++;
 				
 			}
-			if ( consecutive>=14 ) {
+			if ( consecutive>=7 ) {
 				break;
 			}
 			my--;
@@ -90,7 +90,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 					color = 0xff00ffff;
 				if ( pix==0xffff0000 ) {
 					consecutive++;
-					if ( consecutive>6 )
+					if ( consecutive>2 )
 						break;
 				} else {
 					consecutive = 0;
@@ -139,8 +139,8 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		}
 
 		if ( top > 0 && top<230 ) {
-			//for ( int q = 0; q < 3; q++ )
-			//	data[x+320*(top+q)] = 0xffffff00;
+			for ( int q = 0; q < 3; q++ )
+				data[x+320*(top+q)] = 0xffffff00;
 		}
 
 		//Draw to map
@@ -186,7 +186,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 
 int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 	ballCount = 0;
-	for ( int y = 100; y < 240; y+=5 ) {
+	for ( int y = 20; y < 240; y+=5 ) {
 		for ( int x = 0; x < 320; x+=5 ) {
 			int pix = data[x+320*y];
 			if ( pix==0xff0000ff | pix==0xff00ff00 ) {

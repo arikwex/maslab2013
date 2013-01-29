@@ -27,10 +27,14 @@ void ArduinoController::process( int* comm, ImageProcessing* imgProc, int* map )
 
 void ArduinoController::collectedBall() { ballsCollected++; }
 
-void ArduinoController::setGyro( int g ) { gyro = g/100.0f; }
+void ArduinoController::setGyro( int g ) { gyro = g; }
 
 void ArduinoController::setTurbine( int a ) {
 	turbine = a;
+}
+
+void ArduinoController::setGateway( int a ) {
+	gateway = a;
 }
 
 float ArduinoController::getHeadingError( float dest ) {
@@ -53,7 +57,7 @@ void ArduinoController::driveController( float E, int base ) {
 	intG += E;
 	if ( intG>0.1 ) intG = 0.1;
 	if ( intG<-0.1 ) intG = -0.1;
-	float M = (E*5.0f+10.0f*(E-prevG)+intG*0.6f);
+	float M = (E*7.0f+12.0f*(E-prevG)+intG*0.4f);
 	if ( M>1 ) M=1;
 	if ( M<-1 ) M=-1;
 	prevG = E;

@@ -74,11 +74,16 @@ commArd = ArduinoController(ard)
 
 #Wait for self intialization and gyro tuning
 #Resume on power on
-'''
+
+#while True:
+#	turbine.setAngle(180)
+
+
 consecutive = 0
 calibration = time.time()+5
 print "Calibrating Gyro..."
 while ( time.time()<calibration ):
+	ard.notify()
 	pass
 print "Calibration Done!"
 print "Waiting for ON switch..."
@@ -89,7 +94,7 @@ while ( consecutive<30 ):
 		consecutive+=1
 	else:
 		consecutive = 0;
-'''
+
 colorChoice = 0
 if ( colorSetting.getValue()>500 ):
 	colorChoice = 1
@@ -124,8 +129,8 @@ while ( time.time()<ENDTIME ):
 	rightD = ord(commData[1])-1
 	turbine.setAngle(ord(commData[4]))
 	gateway.setAngle(ord(commData[5]))		
-	mL.setSpeed(leftD*ord(commData[2]))
-	mR.setSpeed(rightD*ord(commData[0]))
+	mL.setSpeed(-1*leftD*ord(commData[2]))
+	mR.setSpeed(-1*rightD*ord(commData[0]))
 	#print str(gyro)
 	#print str(gyro) + " --- " + str(leftD*ord(commData[2])) +", " + str(rightD*ord(commData[0]))
 
