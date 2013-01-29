@@ -80,7 +80,6 @@ calibration = time.time()+5
 print "Calibrating Gyro..."
 while ( time.time()<calibration ):
 	ard.notify()
-	gateway.setAngle(180)
 	pass
 print "Calibration Done!"
 print "Waiting for ON switch..."
@@ -122,6 +121,9 @@ while ( time.time()<ENDTIME ):
 	if ( colorSetting.getValue()>700 ):
 		mL.setSpeed(60)
 		mR.setSpeed(40)
+		time.sleep(1000)
+		mL.setSpeed(0)
+		mR.setSpeed(0)
 	else:
 		commArd.process(imgProc)
 		commData = commArd.data

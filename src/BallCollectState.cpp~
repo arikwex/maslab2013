@@ -47,7 +47,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 			else {
 				mode = 2;
 				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;
-				destTime = getTime()+closest*0.4f+0.5f;
+				destTime = getTime()+closest*0.25f+0.5f;
 				std::cout << "GO TO TOWN!" << std::endl;
 			}
 

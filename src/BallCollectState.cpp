@@ -94,10 +94,10 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 			ard->driveController(E,70);
 			if ( time>destTime-0.5 ) {
 				ard->setTurbine(0);
-				ard->collectedBall();
 				std::cout << "Captured!" << std::endl;
 			}
 		} else {
+			ard->collectedBall();
 			return new ExploreState();
 		}
 	}

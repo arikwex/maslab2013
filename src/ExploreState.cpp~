@@ -20,14 +20,13 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	if ( deviate>10 ) deviate = 10;
 	//std::cout << "Explore Deviation: " << deviate << std::endl;
 	float E = ard->getHeadingError( ard->getGyro()+deviate );
-	//ard->driveController(E,50);
-	ard->driveController(0,0);	
+	ard->driveController(E,50);
+	//ard->driveController(0,0);	
 
 	///////////////////////
 	// STATE TRANSITIONS //
 	///////////////////////
 
-/*
 	//If ball confirmed, then begin approach
 	if ( imgProc->ballCount>0 ) {
 		ballConfirmation++;
@@ -38,7 +37,6 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	} else {
 		ballConfirmation = 0;
 	}
-*/
 
 	//If ball collected and I see a deployment region
 	if ( ard->numCollectedBalls()>=0 ) {

@@ -12,8 +12,8 @@ ArduinoController::ArduinoController() {
 	prevG = 0;
 	intG = 0;
 	gyro = 0;
-	turbine = 180;
-	gateway = 0;
+	turbine = 180; 	//down = 180, up = 0
+	gateway = 0;	//open = 180, closed = 0
 }
 
 ArduinoController::~ArduinoController() {
@@ -90,6 +90,10 @@ void ArduinoController::setMotors( int leftM, int rightM ) {
 
 int ArduinoController::numCollectedBalls() {
 	return ballsCollected;
+}
+
+void ArduinoController::clearedBalls() {
+	ballsCollected = 0;
 }
 
 float ArduinoController::getGyro() {

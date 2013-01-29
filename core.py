@@ -121,6 +121,9 @@ while ( time.time()<ENDTIME ):
 	if ( colorSetting.getValue()>700 ):
 		mL.setSpeed(60)
 		mR.setSpeed(40)
+		time.sleep(1)
+		mL.setSpeed(0)
+		mR.setSpeed(0)
 	else:
 		commArd.process(imgProc)
 		commData = commArd.data

@@ -187,7 +187,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 
 	//set the deployment detection variables
 	deploymentRegionVisible = false;
-	if ( yellowN > 20 ) {
+	if ( yellowN > 14 ) {
 		deploymentRegionVisible = true;
 		deploymentRegionAngle = yellowAngleSum / yellowN;
 		deploymentRegionDistance = yellowDistanceSum / yellowN;
