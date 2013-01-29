@@ -36,7 +36,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 			//std::cout << "Distance: " << closest << std::endl;
 			//return this;
 			//if ball is far, approach
-			if ( closest>10 ) {
+			if ( closest>8 ) {
 				if ( closest>20 ) closest = 20;
 				mode = 1;
 				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;

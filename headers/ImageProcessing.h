@@ -14,7 +14,10 @@ class ImageProcessing{
 	int maxX;
 	int maxY;
 	int Nblob;
-	float lefts,rights;	
+	float lefts,rights;
+	float deploymentRegionAngle;
+	float deploymentRegionDistance;
+	bool deploymentRegionVisible;	
 
     public:
 	void classify( int* data );

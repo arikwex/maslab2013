@@ -7,7 +7,7 @@
 class ImageProcessing{
     public:
 	float ballInfo[4];
-	float** storedBalls;
+	float* storedBalls;
 	int ballCount;
 	int minX;
 	int minY;

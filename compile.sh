@@ -1,6 +1,7 @@
 echo "Compiling binaries."
 g++ -c -fPIC src/ExploreState.cpp -o obj/ExploreState.o
 g++ -c -fPIC src/BallCollectState.cpp -o obj/BallCollectState.o
+g++ -c -fPIC src/DeployState.cpp -o obj/DeployState.o
 
 g++ -c -fPIC src/ImageProcessing.cpp -o obj/ImageProcessing.o
 g++ -c -fPIC src/ArduinoController.cpp -o obj/ArduinoController.o

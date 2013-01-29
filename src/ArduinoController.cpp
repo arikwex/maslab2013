@@ -3,6 +3,7 @@
 #include "../headers/ArduinoController.h"
 #include "../headers/ExploreState.h"
 #include "../headers/BallCollectState.h"
+#include "../headers/DeployState.h"
 #include "../headers/IState.h"
 
 

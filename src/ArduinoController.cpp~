@@ -3,11 +3,12 @@
 #include "../headers/ArduinoController.h"
 #include "../headers/ExploreState.h"
 #include "../headers/BallCollectState.h"
+#include "../headers/DeployState.h"
 #include "../headers/IState.h"
 
 
 ArduinoController::ArduinoController() {
-	behavior = new ExploreState();
+	behavior = new DeployState();
 	prevG = 0;
 	intG = 0;
 	gyro = 0;
@@ -57,7 +58,7 @@ void ArduinoController::driveController( float E, int base ) {
 	intG += E;
 	if ( intG>0.1 ) intG = 0.1;
 	if ( intG<-0.1 ) intG = -0.1;
-	float M = (E*7.0f+12.0f*(E-prevG)+intG*0.4f);
+	float M = (E*5.0f+12.0f*(E-prevG)+intG*0.4f);
 	if ( M>1 ) M=1;
 	if ( M<-1 ) M=-1;
 	prevG = E;

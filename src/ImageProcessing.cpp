@@ -20,7 +20,7 @@ void ImageProcessing::classify( int* data ) {
 			data[i] = 0xff00ffff;	
 		} else if ( g > (r+b)*5/8 ) {			//GREEN
 			data[i] = 0xff00ff00;
-		} else if ( b > (r+g)*10/16 & r > g & r>40 & g>40 & b>40) {		//PURPLE
+		} else if ( b > (r+g)*9/16 & r > g & r>40 & g>40 & b>40) {		//PURPLE
 			data[i] = 0xffff00ff;	
 		} else if ( b > (r+g)*6/8 ) {		//BLUE
 			data[i] = 0xffff0000;
@@ -35,6 +35,11 @@ void ImageProcessing::classify( int* data ) {
 void ImageProcessing::findWalls( int* data, int* map ) {
 	int Xc_save = 0;
 	int Zc_save = 0;
+
+	float yellowAngleSum = 0;
+	float yellowDistanceSum = 0;
+	int yellowN = 0;
+
 	lefts=0;
 	rights=0;
 	int wallBroken = 0;
@@ -154,6 +159,13 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		int xi = x-160;
 		float d = beta*objHeight/(eta);
 		float theta = xi/320.0f*spread;
+
+		if ( color==0xff00ffff ) {
+			yellowAngleSum += theta;
+			yellowDistanceSum += d;
+			yellowN++;
+		}
+
 		float Z = d;
 		float deviation = (Z-prev)*(Z-prev);
 		//if ( deviation<25 ) //smoothen mapping
@@ -171,6 +183,14 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 			map[dest] = color;
 		}
 		
+	}
+
+	//set the deployment detection variables
+	deploymentRegionVisible = false;
+	if ( yellowN > 20 ) {
+		deploymentRegionVisible = true;
+		deploymentRegionAngle = yellowAngleSum / yellowN;
+		deploymentRegionDistance = yellowDistanceSum / yellowN;
 	}
 
 	//draw viewport

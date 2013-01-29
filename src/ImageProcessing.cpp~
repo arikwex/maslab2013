@@ -35,6 +35,11 @@ void ImageProcessing::classify( int* data ) {
 void ImageProcessing::findWalls( int* data, int* map ) {
 	int Xc_save = 0;
 	int Zc_save = 0;
+
+	float yellowAngleSum = 0;
+	float yellowDistanceSum = 0;
+	int yellowN = 0;
+
 	lefts=0;
 	rights=0;
 	int wallBroken = 0;
@@ -154,6 +159,13 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		int xi = x-160;
 		float d = beta*objHeight/(eta);
 		float theta = xi/320.0f*spread;
+
+		if ( color==0xff00ffff ) {
+			yellowAngleSum += theta;
+			yellowDistanceSum += d;
+			yellowN++;
+		}
+
 		float Z = d;
 		float deviation = (Z-prev)*(Z-prev);
 		//if ( deviation<25 ) //smoothen mapping
@@ -173,6 +185,14 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		
 	}
 
+	//set the deployment detection variables
+	deploymentRegionVisible = false;
+	if ( yellowN > 20 ) {
+		deploymentRegionVisible = true;
+		deploymentRegionAngle = yellowAngleSum / yellowN;
+		deploymentRegionDistance = yellowDistanceSum / yellowN;
+	}
+
 	//draw viewport
 	for ( int d = 0; d < 100; d++ ) {
 		int x = (int)(sin(spread/2.0f)*d)+160;
@@ -186,7 +206,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 
 int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 	ballCount = 0;
-	for ( int y = 100; y < 240; y+=5 ) {
+	for ( int y = 20; y < 240; y+=5 ) {
 		for ( int x = 0; x < 320; x+=5 ) {
 			int pix = data[x+320*y];
 			if ( pix==0xff0000ff | pix==0xff00ff00 ) {

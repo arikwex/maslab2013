@@ -1,4 +1,7 @@
 #include "../headers/ExploreState.h"
+#include "../headers/BallCollectState.h"
+#include "../headers/DeployState.h"
+
 
 ExploreState::ExploreState() {
 	ballConfirmation = 0;
@@ -24,6 +27,7 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	// STATE TRANSITIONS //
 	///////////////////////
 
+/*
 	//If ball confirmed, then begin approach
 	if ( imgProc->ballCount>0 ) {
 		ballConfirmation++;
@@ -34,21 +38,20 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	} else {
 		ballConfirmation = 0;
 	}
+*/
 
 	//If ball collected and I see a deployment region
-/*
-	if ( ard->numCollectedBalls()>0 ) {
-		if ( imgProc->deploymentWallSeen ) {
+	if ( ard->numCollectedBalls()>=0 ) {
+		//std::cout << "Ready for deploy. " << imgProc->deploymentRegionVisible << std::endl;
+		if ( imgProc->deploymentRegionVisible ) {
 			deployConfirmation++;
-			if ( deployConfirmation>=6 ) {
-				//return new DeployState();
+			if ( deployConfirmation>=10 ) {
+				return new DeployState();
 			}
 		} else {
 			deployConfirmation = 0;
 		}
-	} else {
-		ard->setTurbine(180);
 	}
-*/
+
 	return this;
 }
