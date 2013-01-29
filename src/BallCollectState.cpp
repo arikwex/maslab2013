@@ -47,7 +47,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 			else {
 				mode = 2;
 				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;
-				destTime = getTime()+closest*0.25f+0.5f;
+				destTime = getTime()+closest*0.3f+0.5f;
 				std::cout << "GO TO TOWN!" << std::endl;
 			}
 
@@ -98,6 +98,18 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 			}
 		} else {
 			ard->collectedBall();
+			return new ExploreState();
+			//heading+=170;
+			//mode = 3;
+			//destTime = time+1.5;
+		}
+	}
+	else if ( mode==3 ) {
+		float time = getTime();
+		if ( time<destTime ) {
+			float E = ard->getHeadingError(heading);
+			ard->driveController(E,0);
+		} else {
 			return new ExploreState();
 		}
 	}

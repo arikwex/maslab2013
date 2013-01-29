@@ -118,7 +118,7 @@ while ( time.time()<ENDTIME ):
 	commArd.setGyro(gyro)
 	#print str(imumu.getRawValues())
 
-	if ( colorSetting.getValue()>700 ):
+	if ( False ):#int(ENDTIME-time.time())%22==0 ):
 		mL.setSpeed(60)
 		mR.setSpeed(40)
 		time.sleep(1)
