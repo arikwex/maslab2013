@@ -18,6 +18,7 @@ class ArduinoController{
 
 	//Robot Knowledge goes here
 	int turbine;
+	int gateway;
 	int ballsCollected;
 
     public:
@@ -34,6 +35,8 @@ class ArduinoController{
 	float getGyro();
 
 	void setTurbine( int a );
+
+	void setGateway( int a );
 
 	float getHeadingError( float dest );
 

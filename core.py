@@ -37,7 +37,7 @@ class ArduinoController(object):
 
     def process(self,imgProc):
 	self.ard.notify()
-        #libArduino.ArduinoController_process(self.obj,self.data,imgProc.obj,imgProc.map)
+        libArduino.ArduinoController_process(self.obj,self.data,imgProc.obj,imgProc.map)
 
 
 #Initialize Pygame
@@ -74,15 +74,22 @@ commArd = ArduinoController(ard)
 
 #Wait for self intialization and gyro tuning
 #Resume on power on
+'''
 consecutive = 0
-print "Waiting for power switch to be set ON..."
+calibration = time.time()+5
+print "Calibrating Gyro..."
+while ( time.time()<calibration ):
+	pass
+print "Calibration Done!"
+print "Waiting for ON switch..."
+
 while ( consecutive<30 ):
 	ard.notify()
 	if ( powerButton.getValue()>500 ):
 		consecutive+=1
 	else:
 		consecutive = 0;
-
+'''
 colorChoice = 0
 if ( colorSetting.getValue()>500 ):
 	colorChoice = 1
@@ -112,11 +119,11 @@ while ( time.time()<ENDTIME ):
 
 	commArd.process(imgProc)
 	commData = commArd.data
-	commData = [chr(0),chr(0),chr(0),chr(0),chr(180)]	
+	#commData = [chr(0),chr(0),chr(0),chr(0),chr(180),chr(0)]	
 	leftD = ord(commData[3])-1
 	rightD = ord(commData[1])-1
 	turbine.setAngle(ord(commData[4]))
-	#print ord(commData[4])	
+	gateway.setAngle(ord(commData[5]))		
 	mL.setSpeed(leftD*ord(commData[2]))
 	mR.setSpeed(rightD*ord(commData[0]))
 	#print str(gyro)

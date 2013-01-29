@@ -10,7 +10,14 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	// EXPLORATION //
 	/////////////////
 	
-	std::cout << "EXPLORE STATE." << std::endl;
+	//std::cout << "EXPLORE STATE." << std::endl;
+	int cnt = imgProc->rights - imgProc->lefts;
+	float deviate = cnt*0.4;
+	if ( deviate<-10 ) deviate = -10;
+	if ( deviate>10 ) deviate = 10;
+	//std::cout << "Explore Deviation: " << deviate << std::endl;
+	float E = ard->getHeadingError( ard->getGyro()+deviate );
+	ard->driveController(E,50);	
 
 	///////////////////////
 	// STATE TRANSITIONS //

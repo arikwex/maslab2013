@@ -18,6 +18,7 @@ class ArduinoController{
 
 	//Robot Knowledge goes here
 	int turbine;
+	int gateway;
 	int ballsCollected;
 
     public:
@@ -35,13 +36,15 @@ class ArduinoController{
 
 	void setTurbine( int a );
 
+	void setGateway( int a );
+
 	float getHeadingError( float dest );
 
 	void driveController( float E, int base );
 
 	void setMotors( int leftM, int rightM );
 
-	int numBallsCollected();
+	int numCollectedBalls();
 };
 
 #endif

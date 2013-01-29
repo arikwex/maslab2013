@@ -24,7 +24,7 @@ void ImageProcessing::classify( int* data ) {
 			data[i] = 0xffff00ff;	
 		} else if ( b > (r+g)*6/8 ) {		//BLUE
 			data[i] = 0xffff0000;
-		} else if ( r<140 & g<140 & b<140 ) {	//BLACK treat as blue
+		} else if ( r<100 & g<100 & b<100 ) {	//BLACK treat as blue
 			data[i] = 0xffff0000;
 		} else {
 			data[i] = 0xff000000;
@@ -163,8 +163,10 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		int Xcoord = (int)(X*scale_map+160);
 		int Zcoord = (int)(-Z*scale_map+120);
 		int dest = Xcoord+Zcoord*320;
-		if ( theta<-0.1 ) lefts+=1.0/(d+6);
-		if ( theta>0.1 ) rights+=1.0/(d+6);
+		if ( Z<13 ) { //veer away from things that are too close
+			if ( theta<0 ){ lefts+=1.0; }
+			else{ rights+=1.0; }
+		}
 		if ( Xcoord>0 && Xcoord<320 && Zcoord>0 && Zcoord<240 ) {
 			map[dest] = color;
 		}
@@ -184,7 +186,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 
 int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 	ballCount = 0;
-	for ( int y = 0; y < 240; y+=5 ) {
+	for ( int y = 100; y < 240; y+=5 ) {
 		for ( int x = 0; x < 320; x+=5 ) {
 			int pix = data[x+320*y];
 			if ( pix==0xff0000ff | pix==0xff00ff00 ) {
@@ -194,7 +196,7 @@ int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 
 					int eta = ballInfo[2];
 					int xi = ballInfo[0]-160;
-					float d = beta*2.5f/(eta);
+					float d = beta*2.1f/(eta);
 					float theta = xi/320.0f*spread;
 					float Z = d;
 					float X = (float)(Z*tan(theta));			
@@ -244,7 +246,7 @@ bool ImageProcessing::floodFind( int x, int y, int* data, int search) {
 	if ( minX<=1 && Nblob>40 ) {sided = true; dx = dy;}
 	if ( maxY>=239 && Nblob>30 ) {sided = true; dy=dx;}
 
-	if ( ratio>0.75 && ratio<1.25 && fraction > 0.55 && fraction < 0.95 && Nblob>=20 || sided ) {
+	if ( ratio>0.75 && ratio<1.25 && fraction > 0.55 && fraction < 0.95 && Nblob>=20  || sided ) {
 		ballInfo[0] = (minX+maxX)/2;
 		ballInfo[1] = (minY+maxY)/2;
 		ballInfo[2] = (dx+dy)/2;

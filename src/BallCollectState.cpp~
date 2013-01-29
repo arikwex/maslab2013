@@ -39,14 +39,14 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 				if ( closest>20 ) closest = 20;
 				mode = 1;
 				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;
-				destTime = getTime()+closest/8.0;
+				destTime = getTime()+0.5;
 				//std::cout << imgProc->storedBalls[idx]*57.3 << std::endl;
 			}
 			//if ball is near, go for it
 			else {
-				//mode = 2;
+				mode = 2;
 				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;
-				destTime = getTime()+closest*0.4f;
+				destTime = getTime()+closest*0.4f+0.5f;
 				std::cout << "GO TO TOWN!" << std::endl;
 			}
 
@@ -83,11 +83,13 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 		if ( time<destTime ) {
 			float E = ard->getHeadingError(heading);
 			ard->driveController(E,70);
-			if ( time>destTime-0.5 ) {
-				ard->setTurbine(70);
+			if ( time>destTime-1.0 ) {
+				ard->setTurbine(0);
 				ard->collectedBall();
+				std::cout << "Captured!" << stde::endl;
 			}
 		} else {
+			ard->setTurbine(180);
 			return new ExploreState();
 		}
 	}

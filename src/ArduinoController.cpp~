@@ -12,6 +12,7 @@ ArduinoController::ArduinoController() {
 	intG = 0;
 	gyro = 0;
 	turbine = 180;
+	gateway = 0;
 }
 
 ArduinoController::~ArduinoController() {
@@ -21,7 +22,7 @@ ArduinoController::~ArduinoController() {
 void ArduinoController::process( int* comm, ImageProcessing* imgProc, int* map ) {
 	data = comm;
 	behavior = behavior->update( imgProc, this );
-	data[1] = turbine;
+	data[1] = turbine | (gateway<<8);
 }
 
 void ArduinoController::collectedBall() { ballsCollected++; }
@@ -52,7 +53,7 @@ void ArduinoController::driveController( float E, int base ) {
 	intG += E;
 	if ( intG>0.1 ) intG = 0.1;
 	if ( intG<-0.1 ) intG = -0.1;
-	float M = (E*5.0f+0.0f*(E-prevG)+intG*0.6f);
+	float M = (E*5.0f+10.0f*(E-prevG)+intG*0.6f);
 	if ( M>1 ) M=1;
 	if ( M<-1 ) M=-1;
 	prevG = E;
