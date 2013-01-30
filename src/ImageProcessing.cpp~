@@ -7,12 +7,61 @@
 #define alpha 320.0f/spread
 #define beta 240.0f/spread
 
+#define alphaC 180*100
+#define betaC 140*100
+
+#define blue_b 100		//B = <0,0,1>
+#define red_r 100		//R = <1,0,0>
+#define green_g 100		//G = <0,1,0>
+#define purple_r 71		//P = <0.707,0,0.707>
+#define purple_b 71		//P = <0.707,0,0.707>
+#define white_r 58		//W = <x,x,x>
+#define white_g 58		//W = <x,x,x>
+#define white_b 58		//W = <x,x,x>
+#define yellow_r 71		//Y = <0.707,0.707,0>
+#define yellow_g 71		//Y = <0.707,0.707,0>
+
+
+// Line - Point distance = D
+//
+// D = |(x2-x1) X (x1-x0)| / |(x2-x1)|
+// D = |<R,G,B> X COLOR_NORM|
+// D = |<23-32,31-13,12-21>|
+//
+
+int ImageProcessing::colorDist( int r, int g, int b, int cR, int cG, int cB ) {
+	int dx = (g*cB-b*cG);
+	int dy = (b*cR-r*cB);
+	int dz = (r*cG-g*cR);
+	return (dx*dx+dy*dy+dz*dz);
+}
+
 void ImageProcessing::classify( int* data ) {
+	int darkest = 255*255;
+	int avg = 0;
+	int blR = 0;
+	int blG = 0;
+	int blB = 0;
 	for ( int i = 0; i < 320*240; i++ ) {
 		int p = data[i];
 		int b = (p>>16)&0xff;
 		int g = (p>>8)&0xff;
 		int r = (p)&0xff;
+		int lum = (r*r+g*g+b*b);
+		if ( lum < darkest ) {
+			darkest = lum;
+			blR = r;
+			blG = g;
+			blB = b;
+		}
+	}
+
+	for ( int i = 0; i < 320*240; i++ ) {
+		int p = data[i];
+		int b = (p>>16)&0xff;
+		int g = (p>>8)&0xff;
+		int r = (p)&0xff;
+		int dist = (r-blR)*(r-blR)+(g-blG)*(g-blG)+(b-blB)*(b-blB);
 
 		if ( r > (g+b)*5/8 & r > g*14/10 ) {		//RED
 		 	data[i] = 0xff0000ff;
@@ -20,11 +69,11 @@ void ImageProcessing::classify( int* data ) {
 			data[i] = 0xff00ffff;	
 		} else if ( g > (r+b)*5/8 ) {			//GREEN
 			data[i] = 0xff00ff00;
-		} else if ( b > (r+g)*9/16 & r > g & r>40 & g>40 & b>40) {		//PURPLE
+		} else if ( b > (r+g)*9/16 & r > g & dist>130*130) {		//PURPLE
 			data[i] = 0xffff00ff;	
 		} else if ( b > (r+g)*6/8 ) {		//BLUE
 			data[i] = 0xffff0000;
-		} else if ( r<140 & g<140 & b<140 ) {	//BLACK treat as blue
+		} else if ( dist<180*180 ) {	//FLOOR
 			data[i] = 0xffff0000;
 		} else {
 			data[i] = 0xff000000;
@@ -187,7 +236,7 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 
 	//set the deployment detection variables
 	deploymentRegionVisible = false;
-	if ( yellowN > 20 ) {
+	if ( yellowN > 14 ) {
 		deploymentRegionVisible = true;
 		deploymentRegionAngle = yellowAngleSum / yellowN;
 		deploymentRegionDistance = yellowDistanceSum / yellowN;

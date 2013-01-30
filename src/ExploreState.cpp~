@@ -39,7 +39,8 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	}
 
 	//If ball collected and I see a deployment region
-	if ( ard->numCollectedBalls()>=0 ) {
+	std::cout << "BALLS : " << ard->numCollectedBalls() << std::endl;
+	if ( ard->numCollectedBalls()>0 ) {
 		//std::cout << "Ready for deploy. " << imgProc->deploymentRegionVisible << std::endl;
 		if ( imgProc->deploymentRegionVisible ) {
 			deployConfirmation++;

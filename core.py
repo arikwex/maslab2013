@@ -75,6 +75,7 @@ commArd = ArduinoController(ard)
 #Wait for self intialization and gyro tuning
 #Resume on power on
 
+'''
 consecutive = 0
 calibration = time.time()+5
 print "Calibrating Gyro..."
@@ -97,7 +98,7 @@ if ( colorSetting.getValue()>500 ):
 colorMap = ['Green','Red']
 print "Color Mode: " + colorMap[colorChoice]
 print "Begin Gameplay."
-
+'''
 #Game timer
 ENDTIME = time.time()+3*60
 frames = 0
@@ -118,24 +119,17 @@ while ( time.time()<ENDTIME ):
 	commArd.setGyro(gyro)
 	#print str(imumu.getRawValues())
 
-	if ( False ):#int(ENDTIME-time.time())%22==0 ):
-		mL.setSpeed(60)
-		mR.setSpeed(40)
-		time.sleep(1)
-		mL.setSpeed(0)
-		mR.setSpeed(0)
-	else:
-		commArd.process(imgProc)
-		commData = commArd.data
-		#commData = [chr(0),chr(0),chr(0),chr(0),chr(180),chr(0)]	
-		leftD = ord(commData[3])-1
-		rightD = ord(commData[1])-1
-		turbine.setAngle(ord(commData[4]))
-		gateway.setAngle(ord(commData[5]))		
-		mL.setSpeed(-1*leftD*ord(commData[2]))
-		mR.setSpeed(-1*rightD*ord(commData[0]))
-		#print str(gyro)
-		#print str(gyro) + " --- " + str(leftD*ord(commData[2])) +", " + str(rightD*ord(commData[0]))
+	commArd.process(imgProc)
+	commData = commArd.data
+	#commData = [chr(0),chr(0),chr(0),chr(0),chr(180),chr(0)]	
+	leftD = ord(commData[3])-1
+	rightD = ord(commData[1])-1
+	turbine.setAngle(ord(commData[4]))
+	gateway.setAngle(ord(commData[5]))		
+	mL.setSpeed(-1*leftD*ord(commData[2]))
+	mR.setSpeed(-1*rightD*ord(commData[0]))
+	#print str(gyro)
+	#print str(gyro) + " --- " + str(leftD*ord(commData[2])) +", " + str(rightD*ord(commData[0]))
 
 	#Pygame output
 	img = pygame.image.fromstring(data,(320,240),"RGBX")

@@ -14,9 +14,15 @@ class ImageProcessing{
 	int maxX;
 	int maxY;
 	int Nblob;
-	float lefts,rights;	
+	float lefts,rights;
+	float deploymentRegionAngle;
+	float deploymentRegionDistance;
+	bool deploymentRegionVisible;	
 
     public:
+
+	float colorDist( int r, int g, int b, int cR, int cG, int cB );
+
 	void classify( int* data );
 
 	void findWalls( int* data, int* map );

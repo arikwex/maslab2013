@@ -20,6 +20,9 @@ class ImageProcessing{
 	bool deploymentRegionVisible;	
 
     public:
+
+	int colorDist( int r, int g, int b, int cR, int cG, int cB );
+
 	void classify( int* data );
 
 	void findWalls( int* data, int* map );
