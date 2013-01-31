@@ -67,7 +67,7 @@ void ArduinoController::driveController( float E, int base ) {
 	intG += E;
 	if ( intG>0.4 ) intG = 0.4;
 	if ( intG<-0.4 ) intG = -0.4;
-	float M = (E*5.0f+12.0f*(E-prevG)+intG*0.4f);
+	float M = (E*5.0f+12.0f*(E-prevG)+intG*0.6f);
 	if ( M>1 ) M=1;
 	if ( M<-1 ) M=-1;
 	prevG = E;

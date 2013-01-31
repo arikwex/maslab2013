@@ -8,6 +8,7 @@ DeployState::DeployState() {
 	deployConfirmation = 0;
 	heading = 0;
 	surrenderTime = getTime()+6;
+	correctionCount = 0;
 }
 
 IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) {
@@ -25,6 +26,29 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 
 		//If deployment region visible, approach it
 		if ( imgProc->deploymentRegionVisible ) {
+
+			//If I'm not perpendicular to the deployment region, reorient!
+			float NX = imgProc->deploymentRegionNX;
+			float NY = imgProc->deploymentRegionNY;
+			float angleR = imgProc->deploymentRegionAngle;
+			float finalTheta = atan2(-NX,-NY);
+			if ( correctionCount<1 && (-NY<0.9 || angleR*angleR>0.1) ) {
+				float dist = imgProc->deploymentRegionDistance*1.4f;				
+				//std::cout << "perp: " << angleR*angleR << ", Dist = " << dist << std::endl;
+				float Dx = dist*sin(angleR);
+				float Dy = dist*cos(angleR);
+				float Q = 15;
+				float DestX = (Dx+Q*NX);
+				float DestY = (Dy+Q*NY);
+				float travelDist = sqrt(DestX*DestX+DestY*DestY);
+				float travelAngle = atan2(DestX,DestY);
+				float travelTime = travelDist*0.2f+1;
+				surrenderTime = getTime()+travelTime+6;
+				correctionCount++;
+				return new RepositionState(this,70,(int)(-travelAngle*57.3f+ard->getGyro()),(int)(ard->getGyro()-finalTheta*57.3f),travelTime);
+				//std::cout << "travel dist: " << travelDist << ", ang = " << travelAngle*57.3 << std::endl;
+			}
+
 			deployConfirmation = 0;
 			float closest = imgProc->deploymentRegionDistance;
 			float angle = imgProc->deploymentRegionAngle;
@@ -77,16 +101,18 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 		float time = getTime();
 		if ( time<destTime ) {
 			float E = ard->getHeadingError(heading);
-			ard->driveController(E,160);
-			if ( time>destTime-2.5 ) {
-				if ( ard->getGateway()==0 )
+			if ( ard->getIR()>680 ) {
+				ard->driveController(E,30);
+				if ( ard->getGateway()==20 )
 					std::cout << "Open release gateway." << std::endl;
-				ard->setGateway(180);
+				ard->setGateway(120);
+			} else {
+				ard->driveController(E,160);
 			}
 		} else {
 			std::cout << "Payload deployed successfully." << std::endl;
 			ard->clearedBalls();
-			ard->setGateway(0);
+			ard->setGateway(20);
 			return new ExploreState();
 		}
 	}

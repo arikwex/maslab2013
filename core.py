@@ -83,6 +83,7 @@ calibration = time.time()+5
 print "Calibrating Gyro..."
 while ( time.time()<calibration ):
 	ard.notify()
+	gateway.setAngle(120)
 	pass
 print "Calibration Done!"
 print "Waiting for ON switch..."
@@ -128,8 +129,8 @@ while ( time.time()<ENDTIME ):
 	leftD = ord(commData[3])-1
 	rightD = ord(commData[1])-1
 	turbine.setAngle(ord(commData[4]))
-	gateway.setAngle((ord(commData[5])*2/3+20))
-	#print "gateway: ", ord(commData[5])/2
+	gateway.setAngle(ord(commData[5]))
+	print "gateway: ", ord(commData[5])
 	#print "IR: ",colorSetting.getValue()
 	mL.setSpeed(-1*leftD*ord(commData[2]))
 	mR.setSpeed(-1*rightD*ord(commData[0]))

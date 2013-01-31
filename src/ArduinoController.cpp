@@ -13,7 +13,7 @@ ArduinoController::ArduinoController() {
 	intG = 0;
 	gyro = 0;
 	turbine = 180; 	//down = 180, up = 0
-	gateway = 0;	//open = 180, closed = 0
+	gateway = 20;	//open = 120, closed = 20
 	ballsCollected = 0;
 }
 

@@ -14,7 +14,7 @@ IState* RepositionState::update( ImageProcessing* imgProc, ArduinoController* ar
 	
 	float t = getTime();
 	if ( destTime-t > 1 ) {
-		float E = ard->getHeadingError(heading);		
+		float E = ard->getHeadingError(heading);
 		if ( E*E<0.08 )
 			ard->driveController(E,base);
 		else
@@ -27,6 +27,11 @@ IState* RepositionState::update( ImageProcessing* imgProc, ArduinoController* ar
 	if ( t >= destTime ) {
 		std::cout << "Repositioning Complete!" << std::endl;
 		return previous;
+	} else {
+		if ( base < 0 ){
+			float E = ard->getHeadingError(heading);
+			ard->driveController(E,base);
+		}		
 	}
 
 	return this;

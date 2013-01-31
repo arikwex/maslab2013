@@ -87,11 +87,17 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 
 	float yellowAngleSum = 0;
 	float yellowDistanceSum = 0;
+	float yellowDXSum = 0;
+	float yellowDYSum = 0;
 	int yellowN = 0;
 
 	float purpleAngleSum = 0;
 	float purpleDistanceSum = 0;
+	float purpleDXSum = 0;
+	float purpleDYSum = 0;
 	int purpleN = 0;
+
+	float Xprev = 0;
 
 	lefts=0;
 	rights=0;
@@ -199,6 +205,9 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		if ( top > 0 && top<230 ) {
 			for ( int q = 0; q < 3; q++ )
 				data[x+320*(top+q)] = 0xffffff00;
+			for ( int fy = top; fy>=0; fy-- ) {
+				data[mx+fy*320]=0x00000000;
+			}
 		}
 
 		//Draw to map
@@ -213,22 +222,30 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		float d = beta*objHeight/(eta);
 		float theta = xi/320.0f*spread;
 
+		float Z = d;
+		float deviation = (Z-prev)*(Z-prev);
+		if ( deviation<25 ) //smoothen mapping
+			Z = (Z+prev)/2.0f;
+		float X = (float)(Z*tan(theta));//Z*(xi)/alpha;
+
+		if ( deviation<5 ) {
 		if ( color==0xff00ffff ) {
 			yellowAngleSum += theta;
 			yellowDistanceSum += d;
 			yellowN++;
+			yellowDXSum += (X-Xprev);
+			yellowDYSum += (Z-prev);
 		} else if ( color==0xffff00ff ) {
 			purpleAngleSum += theta;
 			purpleDistanceSum += d;
-			purpleN++;		
+			purpleN++;
+			purpleDXSum += (X-Xprev);
+			purpleDYSum += (Z-prev);
 		}
-
-		float Z = d;
-		float deviation = (Z-prev)*(Z-prev);
-		//if ( deviation<25 ) //smoothen mapping
-			Z = (Z+prev)/2.0f;
+		}
 		prev = Z;
-		float X = (float)(Z*tan(theta));//Z*(xi)/alpha;
+		Xprev = X;
+
 		int Xcoord = (int)(X*scale_map+160);
 		int Zcoord = (int)(-Z*scale_map+120);
 		int dest = Xcoord+Zcoord*320;
@@ -239,7 +256,6 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		if ( Xcoord>0 && Xcoord<320 && Zcoord>0 && Zcoord<240 ) {
 			map[dest] = color;
 		}
-		
 	}
 
 	//set the deployment detection variables
@@ -248,11 +264,32 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		deploymentRegionVisible = true;
 		deploymentRegionAngle = yellowAngleSum / yellowN;
 		deploymentRegionDistance = yellowDistanceSum / yellowN;
+		float DX = yellowDXSum / yellowN;
+		float DY = yellowDYSum / yellowN;
+		float M = (float)sqrt(DX*DX+DY*DY);
+		deploymentRegionNX = DY/M;
+		deploymentRegionNY = -DX/M;
+		float PX = (float)(deploymentRegionDistance*sin(deploymentRegionAngle));
+		float PY = (float)(deploymentRegionDistance*cos(deploymentRegionAngle));
+/*
+		for ( float p = 0; p < 7; p+=0.3f ) {
+			float nx = deploymentRegionNX*p+PX;
+			float ny = deploymentRegionNY*p+PY;
+			int Xcoord = (int)(nx*scale_map+160);
+			int Zcoord = (int)(-ny*scale_map+120);
+			int dest = Xcoord+Zcoord*320;
+			map[dest] = 0xffff0000;
+*/		}
 	}
 	else if ( purpleN > 14 ) {
 		deploymentRegionVisible = true;
 		deploymentRegionAngle = purpleAngleSum / purpleN;
 		deploymentRegionDistance = purpleDistanceSum / purpleN;
+		float DX = purpleDXSum / purpleN;
+		float DY = purpleDYSum / purpleN;
+		float M = sqrt(DX*DX+DY*DY);
+		deploymentRegionNX = DY/M;
+		deploymentRegionNY = -DX/M;
 	}
 
 	//draw viewport
@@ -328,7 +365,7 @@ bool ImageProcessing::floodFind( int x, int y, int* data, int search) {
 	if ( minX<=1 && Nblob>40 && dy>dx ) {sided = true; dx = dy;}
 	if ( maxY>=239 && Nblob>30 ) {sided = true; dy = dx;}
 
-	if ( ratio>0.85 && ratio<1.15 && fraction > 0.65 && fraction < 0.85 && Nblob>=30  || sided ) {
+	if ( ratio>0.75 && ratio<1.25 && fraction > 0.55 && fraction < 0.95 && Nblob>=30  || sided ) {
 		ballInfo[0] = (minX+maxX)/2;
 		ballInfo[1] = (minY+maxY)/2;
 		ballInfo[2] = (dx+dy)/2;

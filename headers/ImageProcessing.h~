@@ -21,7 +21,7 @@ class ImageProcessing{
 
     public:
 
-	float colorDist( int r, int g, int b, int cR, int cG, int cB );
+	int colorDist( int r, int g, int b, int cR, int cG, int cB );
 
 	void classify( int* data );
 

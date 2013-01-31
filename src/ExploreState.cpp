@@ -20,7 +20,7 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	if ( deviate<-30 ) deviate = -30;
 	if ( deviate>30 ) deviate = 30;
 	//std::cout << "Explore Deviation: " << deviate << std::endl;
-	float E = ard->getHeadingError( ard->getGyro()+deviate );
+	float E = ard->getHeadingError( ard->getGyro()+deviate/2 );
 	ard->driveController(E,80 - (float)sqrt(deviate*deviate)*2);
 	//ard->driveController(0,0);
 
@@ -28,9 +28,9 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	// Avoid walls behavior //
 	//////////////////////////
 	//std::cout << "IR SENAZOR: " << ard->getIR() << std::endl;
-	if ( ard->getIR() > 630 ) {
+	if ( ard->getIR() > 650 ) {
 		int finalHeading = ((int)(ard->getGyro()+170))%360;
-		return new RepositionState(this,0,finalHeading,finalHeading,2);
+		return new RepositionState(this,-50,finalHeading,finalHeading,2);
 	}
 
 

@@ -11,7 +11,7 @@ class DeployState : public IState {
 	int destTime;
 	int heading;
 	int mode;
-	float 
+	float surrenderTime;
 
     public:
 	DeployState();

@@ -17,6 +17,8 @@ class ImageProcessing{
 	float lefts,rights;
 	float deploymentRegionAngle;
 	float deploymentRegionDistance;
+	float deploymentRegionNX;
+	float deploymentRegionNY;
 	bool deploymentRegionVisible;	
 
     public:
