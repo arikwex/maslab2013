@@ -1,22 +1,22 @@
-#ifndef BC_STATE_INCLUDE
-#define BC_STATE_INCLUDE
+#ifndef REPOS_STATE_INCLUDE
+#define REPOS_STATE_INCLUDE
 
 #include <ctime>
 #include "ArduinoController.h"
 #include "ImageProcessing.h"
 #include "IState.h"
 
-class BallCollectState : public IState {
+class RepositionState : public IState {
     private:
-	int mode;
-	int ballLost;
+	IState* previous;
+	int base;
 	float heading;
+	float finalHeading;
 	float destTime;
-	float surrenderTime;
 
     public:
 
-	BallCollectState();
+	RepositionState( IState* previous, int base, int target, int finalH, float timer );
 
 	IState* update( ImageProcessing* imgProc, ArduinoController* ard );
 

@@ -69,7 +69,7 @@ void ImageProcessing::classify( int* data ) {
 			data[i] = 0xff00ffff;	
 		} else if ( g > (r+b)*5/8 ) {			//GREEN
 			data[i] = 0xff00ff00;
-		} else if ( b > (r+g)*9/16 & r > g & dist>130*130) {		//PURPLE
+		} else if ( b > (r+g)*9/16 & r > g & dist>150*150) {		//PURPLE
 			data[i] = 0xffff00ff;	
 		} else if ( b > (r+g)*6/8 ) {		//BLUE
 			data[i] = 0xffff0000;
@@ -88,6 +88,10 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 	float yellowAngleSum = 0;
 	float yellowDistanceSum = 0;
 	int yellowN = 0;
+
+	float purpleAngleSum = 0;
+	float purpleDistanceSum = 0;
+	int purpleN = 0;
 
 	lefts=0;
 	rights=0;
@@ -213,6 +217,10 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 			yellowAngleSum += theta;
 			yellowDistanceSum += d;
 			yellowN++;
+		} else if ( color==0xffff00ff ) {
+			purpleAngleSum += theta;
+			purpleDistanceSum += d;
+			purpleN++;		
 		}
 
 		float Z = d;
@@ -240,6 +248,11 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		deploymentRegionVisible = true;
 		deploymentRegionAngle = yellowAngleSum / yellowN;
 		deploymentRegionDistance = yellowDistanceSum / yellowN;
+	}
+	else if ( purpleN > 14 ) {
+		deploymentRegionVisible = true;
+		deploymentRegionAngle = purpleAngleSum / purpleN;
+		deploymentRegionDistance = purpleDistanceSum / purpleN;
 	}
 
 	//draw viewport
@@ -311,15 +324,16 @@ bool ImageProcessing::floodFind( int x, int y, int* data, int search) {
 	float fraction = (float)(Nblob)/(float)(dx*dy);
 
 	bool sided = false;
-	if ( maxX>=319 && Nblob>40 ) {sided = true; dx = dy;}
-	if ( minX<=1 && Nblob>40 ) {sided = true; dx = dy;}
-	if ( maxY>=239 && Nblob>30 ) {sided = true; dy=dx;}
+	if ( maxX>=319 && Nblob>40 && dy>dx ) {sided = true; dx = dy;}
+	if ( minX<=1 && Nblob>40 && dy>dx ) {sided = true; dx = dy;}
+	if ( maxY>=239 && Nblob>30 ) {sided = true; dy = dx;}
 
-	if ( ratio>0.75 && ratio<1.25 && fraction > 0.55 && fraction < 0.95 && Nblob>=20  || sided ) {
+	if ( ratio>0.85 && ratio<1.15 && fraction > 0.65 && fraction < 0.85 && Nblob>=30  || sided ) {
 		ballInfo[0] = (minX+maxX)/2;
 		ballInfo[1] = (minY+maxY)/2;
 		ballInfo[2] = (dx+dy)/2;
 		ballInfo[3] = search;
+		data[(dx/2+minX)+320*(dy/2+minY)] = 0xffffffff;
 		return true;
 	}
 	return false;

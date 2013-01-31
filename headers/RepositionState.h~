@@ -6,17 +6,17 @@
 #include "ImageProcessing.h"
 #include "IState.h"
 
-class BallCollectState : public IState {
+class RepositionState : public IState {
     private:
-	int mode;
-	int ballLost;
+	IState* previous;
+	int base;
 	float heading;
+	float finalHeading;
 	float destTime;
-	float surrenderTime;
 
     public:
 
-	BallCollectState();
+	RepositionState( IState* previous, int base, int target, int finalH, float timer );
 
 	IState* update( ImageProcessing* imgProc, ArduinoController* ard );
 

@@ -13,6 +13,7 @@ class ArduinoController{
 	float prevG;
 	float intG;
 	float gyro;
+	int IR;
 	IState* behavior;
 	int* data;
 
@@ -31,12 +32,16 @@ class ArduinoController{
 	void collectedBall();
 
 	void setGyro( int g );
+	void setIR( int g );
 
 	float getGyro();
+	int getIR();
 
 	void setTurbine( int a );
 
 	void setGateway( int a );
+
+	int getGateway();
 
 	float getHeadingError( float dest );
 

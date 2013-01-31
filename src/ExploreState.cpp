@@ -1,6 +1,7 @@
 #include "../headers/ExploreState.h"
 #include "../headers/BallCollectState.h"
 #include "../headers/DeployState.h"
+#include "../headers/RepositionState.h"
 
 
 ExploreState::ExploreState() {
@@ -16,12 +17,22 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	//std::cout << "EXPLORE STATE." << std::endl;
 	int cnt = imgProc->rights - imgProc->lefts;
 	float deviate = cnt*0.4;
-	if ( deviate<-10 ) deviate = -10;
-	if ( deviate>10 ) deviate = 10;
+	if ( deviate<-30 ) deviate = -30;
+	if ( deviate>30 ) deviate = 30;
 	//std::cout << "Explore Deviation: " << deviate << std::endl;
 	float E = ard->getHeadingError( ard->getGyro()+deviate );
-	ard->driveController(E,50);
-	//ard->driveController(0,0);	
+	ard->driveController(E,80 - (float)sqrt(deviate*deviate)*2);
+	//ard->driveController(0,0);
+
+	//////////////////////////
+	// Avoid walls behavior //
+	//////////////////////////
+	//std::cout << "IR SENAZOR: " << ard->getIR() << std::endl;
+	if ( ard->getIR() > 630 ) {
+		int finalHeading = ((int)(ard->getGyro()+170))%360;
+		return new RepositionState(this,0,finalHeading,finalHeading,2);
+	}
+
 
 	///////////////////////
 	// STATE TRANSITIONS //

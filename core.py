@@ -35,6 +35,9 @@ class ArduinoController(object):
     def setGyro(self,gyro):
         libArduino.ArduinoController_setGyro(self.obj,gyro)
 
+    def setIR(self,IR):
+        libArduino.ArduinoController_setIR(self.obj,IR)
+
     def process(self,imgProc):
 	self.ard.notify()
         libArduino.ArduinoController_process(self.obj,self.data,imgProc.obj,imgProc.map)
@@ -65,7 +68,7 @@ mR = arduino.Motor(ard,0,10,12)
 mL = arduino.Motor(ard,0,11,13)
 mR.setSpeed(0)
 mL.setSpeed(0)
-gateway.setAngle(0)
+gateway.setAngle(180)
 turbine.setAngle(180)
 
 imumu = arduino.IMU(ard)
@@ -75,7 +78,6 @@ commArd = ArduinoController(ard)
 #Wait for self intialization and gyro tuning
 #Resume on power on
 
-'''
 consecutive = 0
 calibration = time.time()+5
 print "Calibrating Gyro..."
@@ -92,13 +94,13 @@ while ( consecutive<30 ):
 	else:
 		consecutive = 0;
 
-colorChoice = 0
-if ( colorSetting.getValue()>500 ):
-	colorChoice = 1
-colorMap = ['Green','Red']
-print "Color Mode: " + colorMap[colorChoice]
-print "Begin Gameplay."
-'''
+#colorChoice = 0
+#if ( colorSetting.getValue()>500 ):
+#	colorChoice = 1
+#colorMap = ['Green','Red']
+#print "Color Mode: " + colorMap[colorChoice]
+print "Begin Primary Functionality."
+
 #Game timer
 ENDTIME = time.time()+3*60
 frames = 0
@@ -117,6 +119,7 @@ while ( time.time()<ENDTIME ):
 	#Arduino Interface
 	gyro = imumu.getRawValues()[0]
 	commArd.setGyro(gyro)
+	commArd.setIR(colorSetting.getValue())
 	#print str(imumu.getRawValues())
 
 	commArd.process(imgProc)
@@ -125,7 +128,9 @@ while ( time.time()<ENDTIME ):
 	leftD = ord(commData[3])-1
 	rightD = ord(commData[1])-1
 	turbine.setAngle(ord(commData[4]))
-	gateway.setAngle(ord(commData[5]))		
+	gateway.setAngle((ord(commData[5])*2/3+20))
+	#print "gateway: ", ord(commData[5])/2
+	#print "IR: ",colorSetting.getValue()
 	mL.setSpeed(-1*leftD*ord(commData[2]))
 	mR.setSpeed(-1*rightD*ord(commData[0]))
 	#print str(gyro)
@@ -144,7 +149,8 @@ while ( time.time()<ENDTIME ):
 	frames+=1
 
 	if ( time.time()-prev > 1 ):
-		print "FPS: " + str(frames)
+		if ( frames<18 ):
+			print "Warning! Low FPS: " + str(frames)
 		frames = 0
 		prev = time.time()
 

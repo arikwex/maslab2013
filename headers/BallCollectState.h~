@@ -1,14 +1,10 @@
 #ifndef BC_STATE_INCLUDE
 #define BC_STATE_INCLUDE
 
-class IState;
-class ArduinoController;
-class ImageProcessing;
-
 #include <ctime>
-#include "IState.h"
 #include "ArduinoController.h"
 #include "ImageProcessing.h"
+#include "IState.h"
 
 class BallCollectState : public IState {
     private:

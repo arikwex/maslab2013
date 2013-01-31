@@ -31,18 +31,24 @@ class ArduinoController{
 	void collectedBall();
 
 	void setGyro( int g );
+	void setIR( int g );
 
 	float getGyro();
+	int getIR();
 
 	void setTurbine( int a );
 
 	void setGateway( int a );
+
+	int getGateway();
 
 	float getHeadingError( float dest );
 
 	void driveController( float E, int base );
 
 	void setMotors( int leftM, int rightM );
+
+	void clearedBalls();
 
 	int numCollectedBalls();
 };

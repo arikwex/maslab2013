@@ -1,0 +1,37 @@
+#include "../headers/RepositionState.h"
+#include "../headers/IState.h"
+
+RepositionState::RepositionState( IState* prev, int b, int target, int finalH, float tm ) {
+	previous = prev;
+	base = b;
+	heading = target;
+	destTime = getTime()+tm+1.0;
+	finalHeading = finalH;
+	std::cout << "Reposition location: time = " << tm << ", heading = " << heading << ", final heading = " << finalHeading << std::endl;
+}
+
+IState* RepositionState::update( ImageProcessing* imgProc, ArduinoController* ard ) {
+	
+	float t = getTime();
+	if ( destTime-t > 1 ) {
+		float E = ard->getHeadingError(heading);		
+		if ( E*E<0.08 )
+			ard->driveController(E,base);
+		else
+			ard->driveController(E,0);
+	} else {
+		float E = ard->getHeadingError(finalHeading);		
+		ard->driveController(E,0);
+	}
+
+	if ( t >= destTime ) {
+		std::cout << "Repositioning Complete!" << std::endl;
+		return previous;
+	}
+
+	return this;
+}
+
+float RepositionState::getTime() { 
+	return ((float)clock())/CLOCKS_PER_SEC;
+}
