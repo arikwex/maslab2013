@@ -29,6 +29,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 		if ( imgProc->ballCount>0 ) {
 			ballLost = 0;
 			ard->setTurbine(180);
+			ard->setGateway(180);
 
 			//find closest
 			float closest = 1000;

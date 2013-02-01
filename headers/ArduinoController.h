@@ -16,6 +16,7 @@ class ArduinoController{
 	int IR;
 	IState* behavior;
 	int* data;
+	float gameTimer;
 
 	//Robot Knowledge goes here
 	int turbine;
@@ -36,6 +37,8 @@ class ArduinoController{
 
 	float getGyro();
 	int getIR();
+	float getTime(); 
+	float getGameTimer();
 
 	void setTurbine( int a );
 

@@ -203,10 +203,10 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		}
 
 		if ( top > 0 && top<230 ) {
-			for ( int q = 0; q < 3; q++ )
-				data[x+320*(top+q)] = 0xffffff00;
+			//for ( int q = 0; q < 3; q++ )
+			//	data[x+320*(top+q)] = 0xffffff00;
 			for ( int fy = top; fy>=0; fy-- ) {
-				data[mx+fy*320]=0x00000000;
+				data[x+fy*320]=0x00000000;
 			}
 		}
 
@@ -269,17 +269,6 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		float M = (float)sqrt(DX*DX+DY*DY);
 		deploymentRegionNX = DY/M;
 		deploymentRegionNY = -DX/M;
-		float PX = (float)(deploymentRegionDistance*sin(deploymentRegionAngle));
-		float PY = (float)(deploymentRegionDistance*cos(deploymentRegionAngle));
-
-		for ( float p = 0; p < 7; p+=0.3f ) {
-			float nx = deploymentRegionNX*p+PX;
-			float ny = deploymentRegionNY*p+PY;
-			int Xcoord = (int)(nx*scale_map+160);
-			int Zcoord = (int)(-ny*scale_map+120);
-			int dest = Xcoord+Zcoord*320;
-			map[dest] = 0xffff0000;
-		}
 	}
 	else if ( purpleN > 14 ) {
 		deploymentRegionVisible = true;
@@ -323,7 +312,7 @@ int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 					int Xcoord = (int)(X*scale_map+160);
 					int Zcoord = (int)(-Z*scale_map+120);
 					int dest = Xcoord+Zcoord*320;
-					if ( Xcoord>0 && Xcoord<320 && Zcoord>0 && Zcoord<240 ) {
+					if ( Xcoord>10 && Xcoord<310 && Zcoord>10 && Zcoord<230 ) {
 						for ( int xx = -3; xx<=3; xx++ ) {
 							for ( int yy = -3; yy<=3; yy++ ) {
 								if ( xx*xx+yy*yy>5 )
@@ -364,6 +353,7 @@ bool ImageProcessing::floodFind( int x, int y, int* data, int search) {
 	if ( maxX>=319 && Nblob>40 && dy>dx ) {sided = true; dx = dy;}
 	if ( minX<=1 && Nblob>40 && dy>dx ) {sided = true; dx = dy;}
 	if ( maxY>=239 && Nblob>30 ) {sided = true; dy = dx;}
+	if ( dx>160 ) { dx=1000; sided=false; }
 
 	if ( ratio>0.75 && ratio<1.25 && fraction > 0.55 && fraction < 0.95 && Nblob>=30  || sided ) {
 		ballInfo[0] = (minX+maxX)/2;

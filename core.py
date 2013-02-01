@@ -130,7 +130,7 @@ while ( time.time()<ENDTIME ):
 	rightD = ord(commData[1])-1
 	turbine.setAngle(ord(commData[4]))
 	gateway.setAngle(ord(commData[5]))
-	print "gateway: ", ord(commData[5])
+	#print "gateway: ", ord(commData[5])
 	#print "IR: ",colorSetting.getValue()
 	mL.setSpeed(-1*leftD*ord(commData[2]))
 	mR.setSpeed(-1*rightD*ord(commData[0]))

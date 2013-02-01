@@ -48,7 +48,7 @@ import pygame.camera
 import pygame.image
 pygame.camera.init()
 cams = pygame.camera.list_cameras()
-cam = pygame.camera.Camera(cams[0],(320,240))
+cam = pygame.camera.Camera(cams[1],(320,240))
 cam.start()
 cam.get_image()
 frames = 0
@@ -68,7 +68,7 @@ mR = arduino.Motor(ard,0,10,12)
 mL = arduino.Motor(ard,0,11,13)
 mR.setSpeed(0)
 mL.setSpeed(0)
-gateway.setAngle(180)
+gateway.setAngle(0)
 turbine.setAngle(180)
 
 imumu = arduino.IMU(ard)

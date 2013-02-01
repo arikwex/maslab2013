@@ -13,8 +13,9 @@ ArduinoController::ArduinoController() {
 	intG = 0;
 	gyro = 0;
 	turbine = 180; 	//down = 180, up = 0
-	gateway = 20;	//open = 120, closed = 20
+	gateway = 180;	//open = 20, closed = 180
 	ballsCollected = 0;
+	gameTimer = getTime();
 }
 
 ArduinoController::~ArduinoController() {
@@ -108,6 +109,15 @@ void ArduinoController::clearedBalls() {
 float ArduinoController::getGyro() {
 	return gyro;
 }
+
+float ArduinoController::getGameTimer() { 
+	return getTime()-gameTimer;
+}
+
+float ArduinoController::getTime() { 
+	return ((float)clock())/CLOCKS_PER_SEC;
+}
+
 
 extern "C" {
     ArduinoController* ArduinoController_new(){ return new ArduinoController(); }

@@ -45,7 +45,8 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 				float travelTime = travelDist*0.2f+1;
 				surrenderTime = getTime()+travelTime+6;
 				correctionCount++;
-				return new RepositionState(this,70,(int)(-travelAngle*57.3f+ard->getGyro()),(int)(ard->getGyro()-finalTheta*57.3f),travelTime);
+				RepositionState* backup = new RepositionState(this,-80,(int)(ard->getGyro()-finalTheta*57.3f),(int)(ard->getGyro()-finalTheta*57.3f),2);
+				return new RepositionState(backup,70,(int)(-travelAngle*57.3f+ard->getGyro()),(int)(ard->getGyro()-finalTheta*57.3f),travelTime);
 				//std::cout << "travel dist: " << travelDist << ", ang = " << travelAngle*57.3 << std::endl;
 			}
 
@@ -101,18 +102,18 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 		float time = getTime();
 		if ( time<destTime ) {
 			float E = ard->getHeadingError(heading);
-			if ( ard->getIR()>680 ) {
-				ard->driveController(E,30);
-				if ( ard->getGateway()==20 )
+			if ( ard->getIR()>770 || time>destTime-1.2f ) {
+				ard->driveController(E-(float)sin(time*2)*0.1,70);
+				if ( ard->getGateway()==180 )
 					std::cout << "Open release gateway." << std::endl;
-				ard->setGateway(120);
+				ard->setGateway(0);
 			} else {
 				ard->driveController(E,160);
 			}
 		} else {
 			std::cout << "Payload deployed successfully." << std::endl;
 			ard->clearedBalls();
-			ard->setGateway(20);
+			ard->setGateway(180);
 			return new ExploreState();
 		}
 	}

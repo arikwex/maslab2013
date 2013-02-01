@@ -29,7 +29,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 		if ( imgProc->ballCount>0 ) {
 			ballLost = 0;
 			ard->setTurbine(180);
-			ard->setGateway(20);
+			ard->setGateway(180);
 
 			//find closest
 			float closest = 1000;
@@ -57,7 +57,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 				mode = 2;
 				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;
 				float E = ard->getHeadingError(heading);
-				destTime = getTime()+closest*0.25f+0.5f;
+				destTime = getTime()+closest*0.20f+0.5f;
 				if ( E*E>0.01 ) {
 					mode = 1;
 					destTime = getTime()+0.2f;
