@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "../headers/ArduinoController.h"
 #include "../headers/ExploreState.h"
@@ -16,6 +18,7 @@ ArduinoController::ArduinoController() {
 	gateway = 180;	//open = 20, closed = 180
 	ballsCollected = 0;
 	gameTimer = getTime();
+	system("echo \"Meta-night Booting up... All systems are now active.\" | espeak -s 120 -p 30 &");
 }
 
 ArduinoController::~ArduinoController() {

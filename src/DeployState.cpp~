@@ -45,6 +45,7 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 				float travelTime = travelDist*0.2f+1;
 				surrenderTime = getTime()+travelTime+6;
 				correctionCount++;
+				system("echo \"Reorienting for deployment.\" | espeak -s 120 -p 30 &");
 				RepositionState* backup = new RepositionState(this,-80,(int)(ard->getGyro()-finalTheta*57.3f),(int)(ard->getGyro()-finalTheta*57.3f),2);
 				return new RepositionState(backup,70,(int)(-travelAngle*57.3f+ard->getGyro()),(int)(ard->getGyro()-finalTheta*57.3f),travelTime);
 				//std::cout << "travel dist: " << travelDist << ", ang = " << travelAngle*57.3 << std::endl;
@@ -63,6 +64,7 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 				mode = 2;
 				heading = ard->getGyro()-angle*57.3;
 				destTime = getTime()+closest*0.12f+2.5f;
+				system("echo \"Initiating deployment sequence.\" | espeak -s 120 -p 30 &");
 				std::cout << "Engaging deployment region. Standby." << std::endl;
 			}
 
@@ -102,7 +104,7 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 		float time = getTime();
 		if ( time<destTime ) {
 			float E = ard->getHeadingError(heading);
-			if ( ard->getIR()>780 || time>destTime-1.2f ) {
+			if ( ard->getIR()>770 || time>destTime-1.2f ) {
 				ard->driveController(E-(float)sin(time*2)*0.1,70);
 				if ( ard->getGateway()==180 )
 					std::cout << "Open release gateway." << std::endl;
@@ -111,6 +113,7 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 				ard->driveController(E,160);
 			}
 		} else {
+			system("echo \"Payload has been delivered.\" | espeak -s 120 -p 30 &");
 			std::cout << "Payload deployed successfully." << std::endl;
 			ard->clearedBalls();
 			ard->setGateway(180);

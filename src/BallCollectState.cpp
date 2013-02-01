@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "../headers/BallCollectState.h"
 #include "../headers/ExploreState.h"
 #include "../headers/RepositionState.h"
@@ -8,6 +10,7 @@ BallCollectState::BallCollectState() {
 	ballLost = 0;
 	destTime = 0;
 	surrenderTime = getTime()+5;
+	system("echo \"A ball has been detected.\" | espeak -s 120 -p 30 &");
 }
 
 IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* ard ) {
@@ -17,6 +20,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 	if ( getTime() > surrenderTime && mode!=2 ) {
 		std::cout << "Surrender on ball collected." << std::endl;
 		int spin = ((int)(ard->getGyro()+180))%360;
+		system("echo \"Surrender on ball acquisition.\" | espeak -s 120 -p 30 &");
 		return new RepositionState(new ExploreState(),0,spin,spin,1);
 	}
 
@@ -63,6 +67,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 					destTime = getTime()+0.2f;
 					std::cout << "Tuning before collection" << std::endl;
 				} else {
+					system("echo \"Engaging target!\" | espeak -s 120 -p 30 &");
 					std::cout << "GO TO TOWN!" << std::endl;
 				}
 			}
@@ -111,6 +116,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 				ard->setTurbine(0);
 			}
 		} else {
+			system("echo \"Capture sequence complete.\" | espeak -s 120 -p 30 &");
 			ard->collectedBall();
 			std::cout << "Captured! Ball count = " << ard->numCollectedBalls() << std::endl;
 			return new ExploreState();

@@ -68,7 +68,7 @@ mR = arduino.Motor(ard,0,10,12)
 mL = arduino.Motor(ard,0,11,13)
 mR.setSpeed(0)
 mL.setSpeed(0)
-gateway.setAngle(0)
+gateway.setAngle(180)
 turbine.setAngle(180)
 
 imumu = arduino.IMU(ard)
@@ -130,7 +130,7 @@ while ( time.time()<ENDTIME ):
 	rightD = ord(commData[1])-1
 	turbine.setAngle(ord(commData[4]))
 	gateway.setAngle(ord(commData[5]))
-	print "gateway: ", ord(commData[5])
+	#print "gateway: ", ord(commData[5])
 	#print "IR: ",colorSetting.getValue()
 	mL.setSpeed(-1*leftD*ord(commData[2]))
 	mR.setSpeed(-1*rightD*ord(commData[0]))
