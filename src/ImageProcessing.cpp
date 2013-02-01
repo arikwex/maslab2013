@@ -317,7 +317,7 @@ int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 					int unreachable = 0;
 					if ( Xcoord>10 && Xcoord<310 && Zcoord>10 && Zcoord<230 ) {
 						for ( int xx = -5; xx<=5; xx++ ) {
-							for ( int yy = -5; yy<=5 yy++ ) {
+							for ( int yy = -5; yy<=5; yy++ ) {
 								if ( map[dest+xx+yy*320]&0x00ffffff!=0x00000000 ) {
 									unreachable++;
 								}
