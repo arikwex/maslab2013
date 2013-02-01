@@ -114,7 +114,7 @@ IState* DeployState::update( ImageProcessing* imgProc, ArduinoController* ard ) 
 			std::cout << "Payload deployed successfully." << std::endl;
 			ard->clearedBalls();
 			ard->setGateway(180);
-			return new ExploreState();
+			return new RepositionState(new ExploreState(),-70,(int)(ard->getGyro()+170),(int)(ard->getGyro()+170),2);
 		}
 	}
 
