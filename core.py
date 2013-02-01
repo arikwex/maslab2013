@@ -48,7 +48,7 @@ import pygame.camera
 import pygame.image
 pygame.camera.init()
 cams = pygame.camera.list_cameras()
-cam = pygame.camera.Camera(cams[0],(320,240))
+cam = pygame.camera.Camera(cams[1],(320,240))
 cam.start()
 cam.get_image()
 frames = 0
@@ -77,7 +77,6 @@ commArd = ArduinoController(ard)
 
 #Wait for self intialization and gyro tuning
 #Resume on power on
-
 '''
 consecutive = 0
 calibration = time.time()+5

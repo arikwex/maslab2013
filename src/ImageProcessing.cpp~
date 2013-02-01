@@ -309,25 +309,44 @@ int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 					float Z = d;
 					float X = (float)(Z*tan(theta));			
 
+					//last confirmation: Ball is reachable
+
 					int Xcoord = (int)(X*scale_map+160);
 					int Zcoord = (int)(-Z*scale_map+120);
 					int dest = Xcoord+Zcoord*320;
+					int unreachable = 0;
 					if ( Xcoord>10 && Xcoord<310 && Zcoord>10 && Zcoord<230 ) {
+						for ( int xx = -5; xx<=5; xx++ ) {
+							for ( int yy = -5; yy<=5 yy++ ) {
+								if ( map[dest+xx+yy*320]&0x00ffffff!=0x00000000 ) {
+									unreachable++;
+								}
+							}
+						}
 						for ( int xx = -3; xx<=3; xx++ ) {
 							for ( int yy = -3; yy<=3; yy++ ) {
-								if ( xx*xx+yy*yy>5 )
-									continue;
+								if ( unreachable<4 ) {
+									//reachable means draw a circle
+									if ( xx*xx+yy*yy>5 )
+										continue;
+								} else {
+									//unreachable means draw an X
+									if ( xx!=yy && xx!=-yy )
+										continue;
+								}
 								map[dest+xx+yy*320] = pix;
 							}
 						}
 					}
 
-					ballData[base] = theta;
-					ballData[base+1] = d;
-					ballData[base+2] = eta;
-					ballData[base+3] = pix;
-					this->storedBalls = ballData;
-					ballCount++;
+					if ( unreachable<4 ) {
+						ballData[base] = theta;
+						ballData[base+1] = d;
+						ballData[base+2] = eta;
+						ballData[base+3] = pix;
+						this->storedBalls = ballData;
+						ballCount++;
+					}
 				}
 			}
 		}
@@ -353,7 +372,7 @@ bool ImageProcessing::floodFind( int x, int y, int* data, int search) {
 	if ( maxX>=319 && Nblob>40 && dy>dx ) {sided = true; dx = dy;}
 	if ( minX<=1 && Nblob>40 && dy>dx ) {sided = true; dx = dy;}
 	if ( maxY>=239 && Nblob>30 ) {sided = true; dy = dx;}
-	if ( dx>160 ) { dx=1000; sided=false; }
+	if ( dx>100 || dy>90 ) { dx=1000; sided=false; Nblob = 1; }
 
 	if ( ratio>0.75 && ratio<1.25 && fraction > 0.55 && fraction < 0.95 && Nblob>=30  || sided ) {
 		ballInfo[0] = (minX+maxX)/2;
