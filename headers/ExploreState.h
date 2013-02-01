@@ -9,6 +9,7 @@ class ExploreState : public IState {
     private:
 	int ballConfirmation;
 	int deployConfirmation;
+	bool dontTalk;
 
     public:
 	ExploreState();

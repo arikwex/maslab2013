@@ -50,7 +50,10 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 			//return this;
 			//if ball is far, approach
 			if ( closest>10 ) {
-				if ( closest>20 ) closest = 20;
+				if ( closest>20 ){
+					closest = 20;
+					surrenderTime += 0.27f; //if far away, give me time to reach it.
+				}
 				mode = 1;
 				heading = ard->getGyro()-imgProc->storedBalls[idx]*57.3;
 				destTime = getTime()+0.3;
@@ -119,7 +122,7 @@ IState* BallCollectState::update( ImageProcessing* imgProc, ArduinoController* a
 			system("echo \"Capture sequence complete.\" | espeak -s 120 -p 30 &");
 			ard->collectedBall();
 			std::cout << "Captured! Ball count = " << ard->numCollectedBalls() << std::endl;
-			return new ExploreState();
+			return new RepositionState(new ExploreState(),-70,(int)(ard->getGyro()),(int)(ard->getGyro()),1.5f);
 		}
 	}
 

@@ -18,7 +18,7 @@ ArduinoController::ArduinoController() {
 	gateway = 180;	//open = 20, closed = 180
 	ballsCollected = 0;
 	gameTimer = getTime();
-	system("echo \"Meta-night Booting up... All systems are now active.\" | espeak -s 120 -p 30 &");
+	system("echo \"Booting up. . . . All systems are now active.\" | espeak -s 120 -p 30 -a 200 &");
 }
 
 ArduinoController::~ArduinoController() {

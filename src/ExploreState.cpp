@@ -1,4 +1,7 @@
 #include "../headers/ExploreState.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 #include "../headers/BallCollectState.h"
 #include "../headers/DeployState.h"
 #include "../headers/RepositionState.h"
@@ -7,12 +10,21 @@
 ExploreState::ExploreState() {
 	ballConfirmation = 0;
 	deployConfirmation = 0;
+	dontTalk = false;
 }
 
 IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard ) {
 	/////////////////
 	// EXPLORATION //
 	/////////////////
+
+	if ( ((int)ard->getGameTimer())%5==0 ) {
+		if ( !dontTalk )
+			system("echo \"Exploring...\" | espeak -s 120 -p 30 &");
+		dontTalk = true;
+	} else {
+		dontTalk = false;
+	}
 	
 	//std::cout << "EXPLORE STATE." << std::endl;
 	int cnt = imgProc->rights - imgProc->lefts;
@@ -28,9 +40,10 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	// Avoid walls behavior //
 	//////////////////////////
 	//std::cout << "IR SENAZOR: " << ard->getIR() << std::endl;
-	if ( ard->getIR() > 650 ) {
+	if ( ard->getIR() > 670 || ard->getIR() < 0 ) {
 		int finalHeading = ((int)(ard->getGyro()+170))%360;
-		return new RepositionState(this,-50,finalHeading,finalHeading,2);
+		system("echo \"Backing up...\" | espeak -s 120 -p 30 &");
+		return new RepositionState(this,-55,finalHeading,finalHeading,2);
 	}
 
 
@@ -52,7 +65,7 @@ IState* ExploreState::update( ImageProcessing* imgProc, ArduinoController* ard )
 	//If ball collected and I see a deployment region
 	//std::cout << "BALLS : " << ard->numCollectedBalls() << std::endl;
 	//std::cout << "game timer: " << ard->getGameTimer() << std::endl;
-	if ( (ard->numCollectedBalls()>0 && ard->getGameTimer()>90) || ard->numCollectedBalls()>=1 ) {
+	if ( (ard->numCollectedBalls()>0 && ard->getGameTimer()>90) || ard->numCollectedBalls()>=3 ) {
 		//std::cout << "Ready for deploy. " << imgProc->deploymentRegionVisible << std::endl;
 		if ( imgProc->deploymentRegionVisible ) {
 			deployConfirmation++;

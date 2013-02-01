@@ -69,11 +69,11 @@ void ImageProcessing::classify( int* data ) {
 			data[i] = 0xff00ffff;	
 		} else if ( g > (r+b)*5/8 ) {			//GREEN
 			data[i] = 0xff00ff00;
-		} else if ( b > (r+g)*9/16 & r > g & dist>150*150) {		//PURPLE
+		} else if ( b > (r+g)*9/16 & r > g & dist>3*50*50) {		//PURPLE
 			data[i] = 0xffff00ff;	
-		} else if ( b > (r+g)*6/8 ) {		//BLUE
+		} else if ( b > (r+g)*5/8 ) {		//BLUE
 			data[i] = 0xffff0000;
-		} else if ( dist<180*180 ) {	//FLOOR
+		} else if ( dist<3*120*120 ) {	//FLOOR
 			data[i] = 0xffff0000;
 		} else {
 			data[i] = 0xff000000;
@@ -205,7 +205,9 @@ void ImageProcessing::findWalls( int* data, int* map ) {
 		if ( top > 0 && top<230 ) {
 			//for ( int q = 0; q < 3; q++ )
 			//	data[x+320*(top+q)] = 0xffffff00;
-			for ( int fy = top; fy>=0; fy-- ) {
+			int vt = top;
+			if ( vt>60 ) vt = 60;
+			for ( int fy = vt; fy>=0; fy-- ) {
 				data[x+fy*320]=0x00000000;
 			}
 		}
@@ -306,26 +308,33 @@ int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 					int xi = ballInfo[0]-160;
 					float d = beta*2.1f/(eta);
 					float theta = xi/320.0f*spread;
-					float Z = d;
+					float Z = d*1.1f;
 					float X = (float)(Z*tan(theta));			
 
 					//last confirmation: Ball is reachable
-
 					int Xcoord = (int)(X*scale_map+160);
 					int Zcoord = (int)(-Z*scale_map+120);
 					int dest = Xcoord+Zcoord*320;
 					int unreachable = 0;
 					if ( Xcoord>10 && Xcoord<310 && Zcoord>10 && Zcoord<230 ) {
-						for ( int xx = -5; xx<=5; xx++ ) {
-							for ( int yy = -5; yy<=5 yy++ ) {
-								if ( map[dest+xx+yy*320]&0x00ffffff!=0x00000000 ) {
+						for ( float ext = 0; ext<=1.0; ext+=0.01f ) {
+							int Xcoord = (int)((X*ext)*scale_map+160);
+							int Zcoord = (int)(-(Z*ext)*scale_map+120);
+							int dest = Xcoord+Zcoord*320;
+							for ( int xx = -7; xx<=7; xx++ ) {
+								if ( map[dest+xx]&0x00ffffff!=0x00000000 ) {
 									unreachable++;
+									if ( unreachable>15 ) {
+										ext=1.1;
+										break;
+									}
 								}
 							}
 						}
+
 						for ( int xx = -3; xx<=3; xx++ ) {
 							for ( int yy = -3; yy<=3; yy++ ) {
-								if ( unreachable<4 ) {
+								if ( unreachable<8 ) {
 									//reachable means draw a circle
 									if ( xx*xx+yy*yy>5 )
 										continue;
@@ -337,15 +346,15 @@ int ImageProcessing::findBalls( int* data, float* ballData, int* map ) {
 								map[dest+xx+yy*320] = pix;
 							}
 						}
-					}
 
-					if ( unreachable<4 ) {
-						ballData[base] = theta;
-						ballData[base+1] = d;
-						ballData[base+2] = eta;
-						ballData[base+3] = pix;
-						this->storedBalls = ballData;
-						ballCount++;
+						if ( unreachable<5 ) {
+							ballData[base] = theta;
+							ballData[base+1] = d;
+							ballData[base+2] = eta;
+							ballData[base+3] = pix;
+							this->storedBalls = ballData;
+							ballCount++;
+						}
 					}
 				}
 			}

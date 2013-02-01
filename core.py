@@ -77,7 +77,6 @@ commArd = ArduinoController(ard)
 
 #Wait for self intialization and gyro tuning
 #Resume on power on
-'''
 consecutive = 0
 calibration = time.time()+5
 print "Calibrating Gyro..."
@@ -94,7 +93,7 @@ while ( consecutive<30 ):
 		consecutive+=1
 	else:
 		consecutive = 0;
-'''
+
 #colorChoice = 0
 #if ( colorSetting.getValue()>500 ):
 #	colorChoice = 1
